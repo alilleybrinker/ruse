@@ -1,5 +1,11 @@
 [package]
-name = "ruse"
-version = "0.1.0"
-authors = ["Andrew Brinker <me@andrewbrinker.com>"]
+name        = "ruse"
+version     = "0.1.0"
+authors     = ["Andrew Brinker <me@andrewbrinker.com>"]
+description = "An embedded Scheme for Rust, like Lua for C."
+homepage    = "https://github.com/ruse-lang/ruse"
+repository  = "https://github.com/ruse-lang/ruse"
+readme      = "README.md"
+keywords    = ["language", "lisp"]
+license     = "Apache 2.0 / MIT"
 
