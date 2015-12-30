@@ -9,3 +9,11 @@ readme      = "README.md"
 keywords    = ["language", "lisp"]
 license     = "Apache 2.0 / MIT"
 
+[lib]
+name = "ruse"
+path = "lib/lib.rs"
+
+[[bin]]
+name = "iruse"
+path = "src/main.rs"
+
