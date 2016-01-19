@@ -1,8 +1,9 @@
 extern crate ruse;
-use ruse::hello;
+use ruse::symbol;
 
 fn main() {
-    hello();
+    let result = symbol("!");
+    println!("{:?}", result);
 }
 
 

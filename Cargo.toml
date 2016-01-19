@@ -14,6 +14,9 @@ name = "ruse"
 path = "lib/lib.rs"
 
 [[bin]]
-name = "iruse"
+name = "ruse"
 path = "src/main.rs"
+
+[dependencies]
+combine = "^1.0"
 

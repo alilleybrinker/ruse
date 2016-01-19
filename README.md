@@ -24,6 +24,11 @@ This is a brand new project, and the initial goal is simply to get a simple base
 
 All discussions and contributions will be handled via GitHub Issues and Pull Requests. If you have an idea or change you'd like to have made, open an Issue, and possibly make a Pull Request. If you have any questions about the process, open an Issue asking for clarification.
 
+## Structure
 
+The core of Ruse is implemented as a Rust crate usable by any Rust program, with a binary program providing a command line interface to the crate's functionality.
 
+## Parsing
+
+There are (fantastically) a number of options for parsing in Rust. The most developed of these is Nom, but for Ruse we'll likely be using combine
 
