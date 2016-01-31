@@ -2,11 +2,9 @@ extern crate ruse;
 use ruse::*;
 
 fn main() {
-    //let result = symbol("!");
-    //println!("{:?}", result);
-
-    let result = quoted_string(&"\"a\"".as_bytes());
-    println!("{:?}", String::from_utf8_unchecked(result));
+    if let IResult::Done(_, result) = quoted_string(b"\"a\"") {
+        println!("{}", String::from_utf8(result.to_vec()).unwrap());
+    }
 }
 
 

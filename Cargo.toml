@@ -15,7 +15,7 @@ path = "src/ruse/lib.rs"
 
 [[bin]]
 name = "ruse"
-path = "bin/ruse.rs"
+path = "src/bin/ruse.rs"
 doc  = false
 
 [dependencies]
