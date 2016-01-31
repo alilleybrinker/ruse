@@ -1,3 +1,5 @@
+use nom::IResult;
+
 #[derive(Debug, PartialEq)]
 pub enum RuseVal {
     Atom(String),
@@ -8,25 +10,40 @@ pub enum RuseVal {
     Bool(bool),
 }
 
+pub type ParseError = u32;
+
+pub fn parse(input: &str) -> Result<RuseVal, ParseError> {
+    match ruse_string(&input.as_bytes()[..]) {
+        IResult::Done(_, rc) => Ok(rc),
+        _ => Err(0)
+    }
+}
+
+/// Parse the insides of a quoted string, returning a RuseVal::Stringy
 named!(
-    pub quoted_string,
+    ruse_string(&[u8]) -> RuseVal,
+    chain!(
+        s: quoted_string,
+        || {
+            let s = String::from_utf8(s.to_vec()).unwrap();
+            RuseVal::Stringy(s)
+        }));
+
+named!(
+    quoted_string,
     delimited!(
         char!('"'),
         take_until_either!("\""),
-        char!('"')
-    )
-);
+        char!('"')));
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use nom::IResult;
 
     #[test]
     fn test_quoted_string() {
-        if let IResult::Done(_, result) = quoted_string(b"\"a\"") {
-            let result = String::from_utf8(result.to_vec()).unwrap();
-            assert_eq!("a", result);
+        if let Ok(RuseVal::Stringy(s)) = parse(r#""a""#) {
+            assert_eq!("a", s);
         }
     }
 }
