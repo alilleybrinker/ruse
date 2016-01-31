@@ -11,12 +11,13 @@ license     = "Apache 2.0 / MIT"
 
 [lib]
 name = "ruse"
-path = "lib/lib.rs"
+path = "src/ruse/lib.rs"
 
 [[bin]]
 name = "ruse"
-path = "src/main.rs"
+path = "bin/ruse.rs"
+doc  = false
 
 [dependencies]
-combine = "^1.0"
+nom = "~1.1.0"
 
