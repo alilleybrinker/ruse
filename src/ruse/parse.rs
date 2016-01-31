@@ -20,7 +20,14 @@ named!(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use nom::IResult;
 
-    // TODO: Add tests here.
+    #[test]
+    fn test_quoted_string() {
+        if let IResult::Done(_, result) = quoted_string(b"\"a\"") {
+            let result = String::from_utf8(result.to_vec()).unwrap();
+            assert_eq!("a", result);
+        }
+    }
 }
 
