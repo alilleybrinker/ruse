@@ -19,7 +19,6 @@ pub fn parse(input: &str) -> Result<RuseVal, ParseError> {
     }
 }
 
-/// Parse the insides of a quoted string, returning a RuseVal::Stringy
 named!(
     ruse_string(&[u8]) -> RuseVal,
     chain!(
@@ -33,7 +32,7 @@ named!(
     quoted_string,
     delimited!(
         char!('"'),
-        take_until_either!("\""),
+        quoted_string,
         char!('"')));
 
 #[cfg(test)]
@@ -41,9 +40,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_quoted_string() {
+    fn simple_quoted_string() {
         if let Ok(RuseVal::Stringy(s)) = parse(r#""a""#) {
             assert_eq!("a", s);
+        }
+    }
+
+    #[test]
+    fn escaped_quoted_string() {
+        if let Ok(RuseVal::Stringy(s)) = parse("\"\"a\"\"") {
+            assert_eq!("\"a\"", s);
+        }
+    }
+
+    #[test]
+    fn broken_quoted_string() {
+        if let Err(_) = parse("\"\"a\"") {
+            assert!(true);
         }
     }
 }
