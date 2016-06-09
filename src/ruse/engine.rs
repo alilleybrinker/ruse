@@ -1,4 +1,4 @@
-use parse::{Parser, SyntaxTree};
+use parse::Parser;
 
 pub struct Engine {}
 
