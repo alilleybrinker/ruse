@@ -18,6 +18,3 @@ name = "ruse"
 path = "src/bin/ruse.rs"
 doc  = false
 
-[dependencies]
-nom = "~1.1.0"
-
