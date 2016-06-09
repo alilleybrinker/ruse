@@ -9,7 +9,7 @@ impl Engine {
 
     pub fn eval<S: AsRef<str>>(&mut self, s: S) -> String {
         let mut parser: Parser = Parser::new();
-        let result: String = parser.parse(s.as_ref()).into();
+        let result: String = parser.parse(s.as_ref()).unwrap().into();
         result
     }
 }

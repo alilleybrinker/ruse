@@ -1,5 +1,6 @@
-use stack::Stack;
+use parse::error::ParseResult;
 use std::iter::Peekable;
+use std::str::Chars;
 
 pub struct Parser {}
 
@@ -27,32 +28,11 @@ impl Parser {
     /// For now, this is done by assuming that the first item after an open
     /// paren is a function call, and that everything after is an atom. This
     /// will obviously become better over time.
-    pub fn parse<S: AsRef<str>>(&mut self, s: S) -> SyntaxTree {
+    pub fn parse<S: AsRef<str>>(&mut self, s: S) -> ParseResult {
         self.parse_peekable(s.as_ref().chars().peekable())
     }
 
-    fn parse_peekable<I: Iterator>(&mut self, s: Peekable<I>) -> SyntaxTree {
+    fn parse_peekable<'a>(&mut self, s: Peekable<Chars<'a>>) -> ParseResult {
         unimplemented!();
-    }
-}
-
-pub enum SyntaxNode {
-    Function(String),
-    Atom(i64),
-}
-
-pub struct SyntaxTree {
-    tree: Stack<SyntaxNode>,
-}
-
-impl SyntaxTree {
-    pub fn new() -> SyntaxTree {
-        SyntaxTree { tree: Stack::new() }
-    }
-}
-
-impl Into<String> for SyntaxTree {
-    fn into(self) -> String {
-        "Syntax Tree".to_string()
     }
 }
