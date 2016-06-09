@@ -1,4 +1,4 @@
-use parse::Parser;
+use parse::{Parser, ParseError};
 
 pub struct Engine {}
 
@@ -7,9 +7,10 @@ impl Engine {
         Engine {}
     }
 
-    pub fn eval<S: AsRef<str>>(&mut self, s: S) -> String {
+    // TODO: Create an EvalError type.
+    pub fn eval<S: AsRef<str>>(&mut self, s: S) -> Result<String, ParseError> {
         let mut parser: Parser = Parser::new();
-        let result: String = parser.parse(s.as_ref()).unwrap().into();
-        result
+        let result: String = try!(parser.parse(s.as_ref())).into();
+        Ok(result)
     }
 }
