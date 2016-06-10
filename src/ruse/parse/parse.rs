@@ -1,6 +1,4 @@
-use parse::error::ParseResult;
-use std::iter::Peekable;
-use std::str::Chars;
+use parse::{ParseResult, TokenIterator, lex};
 
 pub struct Parser {}
 
@@ -29,10 +27,10 @@ impl Parser {
     /// paren is a function call, and that everything after is an atom. This
     /// will obviously become better over time.
     pub fn parse<S: AsRef<str>>(&mut self, s: S) -> ParseResult {
-        self.parse_peekable(s.as_ref().chars().peekable())
+        self.parse_tokens(lex(s.as_ref()))
     }
 
-    fn parse_peekable<'a>(&mut self, s: Peekable<Chars<'a>>) -> ParseResult {
+    fn parse_tokens<'a>(&mut self, s: TokenIterator<'a>) -> ParseResult {
         unimplemented!();
     }
 }
