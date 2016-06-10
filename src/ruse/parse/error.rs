@@ -17,7 +17,9 @@ impl Error for ParseError {
     }
 
     fn cause(&self) -> Option<&Error> {
-        None
+        match *self {
+            ParseError::BadInput(ref lex_error) => Some(lex_error),
+        }
     }
 }
 
