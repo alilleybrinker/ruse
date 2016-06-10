@@ -10,7 +10,8 @@ impl Lexer {
         Lexer { location: Cell::new(0) }
     }
 
-    pub fn lex<'a>(&self, s: TokenIterator<'a>) -> LexResult {
+    pub fn lex(&self, s: &str) -> LexResult {
+        let token_iter = TokenIterator::new(s);
         // Construct a Vec<Token<'a>> from the TokenIterator, erroring out if a
         // lexing error is encountered.
         //

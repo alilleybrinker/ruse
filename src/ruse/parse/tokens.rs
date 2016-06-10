@@ -2,12 +2,12 @@ use std::iter::Peekable;
 use std::str::Chars;
 
 pub struct TokenIterator<'a> {
-    char_iterator: Peekable<Chars<'a>>,
+    char_iter: Peekable<Chars<'a>>,
 }
 
 impl<'a> TokenIterator<'a> {
     pub fn new<'b>(s: &'b str) -> TokenIterator<'b> {
-        TokenIterator { char_iterator: s.chars().peekable() }
+        TokenIterator { char_iter: s.chars().peekable() }
     }
 }
 

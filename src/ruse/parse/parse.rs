@@ -1,4 +1,4 @@
-use parse::{ParseResult, TokenIterator, Lexer};
+use parse::{ParseResult, Lexer};
 
 pub struct Parser {}
 
@@ -28,8 +28,7 @@ impl Parser {
     /// will obviously become better over time.
     pub fn parse<S: AsRef<str>>(&mut self, s: S) -> ParseResult {
         let lexer = Lexer::new();
-        let token_iterator = TokenIterator::new(s.as_ref());
-        let tokens = try!(lexer.lex(token_iterator));
+        let tokens = try!(lexer.lex(s.as_ref()));
         // Tokens will be a Vec<Token<'a>>, which should then be parsed into a
         // SyntaxTree.
         unimplemented!()
