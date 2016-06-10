@@ -1,4 +1,4 @@
-use parse::{ParseResult, TokenIterator, lex};
+use parse::{ParseResult, LexResult, TokenIterator};
 
 pub struct Parser {}
 
@@ -27,10 +27,11 @@ impl Parser {
     /// paren is a function call, and that everything after is an atom. This
     /// will obviously become better over time.
     pub fn parse<S: AsRef<str>>(&mut self, s: S) -> ParseResult {
-        self.parse_tokens(lex(s.as_ref()))
+        try!(self.lex(TokenIterator::new(s.as_ref())));
+        unimplemented!()
     }
 
-    fn parse_tokens<'a>(&mut self, s: TokenIterator<'a>) -> ParseResult {
+    fn lex<'a>(&mut self, s: TokenIterator<'a>) -> LexResult {
         unimplemented!();
     }
 }

@@ -1,4 +1,4 @@
-use parse::syntax_tree::SyntaxTree;
+use parse::{SyntaxTree, Token};
 use std::error::Error;
 use std::fmt;
 
@@ -26,6 +26,14 @@ impl fmt::Display for ParseError {
         write!(f, "{}", self.description())
     }
 }
+
+impl From<LexError> for ParseError {
+    fn from(err: LexError) -> ParseError {
+        ParseError::BadInput(err)
+    }
+}
+
+pub type LexResult<'a> = Result<Vec<Token<'a>>, LexError>;
 
 #[derive(Debug)]
 pub enum LexError {
