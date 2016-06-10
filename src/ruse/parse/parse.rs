@@ -27,11 +27,16 @@ impl Parser {
     /// paren is a function call, and that everything after is an atom. This
     /// will obviously become better over time.
     pub fn parse<S: AsRef<str>>(&mut self, s: S) -> ParseResult {
-        try!(self.lex(TokenIterator::new(s.as_ref())));
+        let token_iterator = TokenIterator::new(s.as_ref());
+        let tokens = try!(self.lex(token_iterator));
+        // Tokens will be a Vec<Token<'a>>, which should then be parsed into a
+        // SyntaxTree.
         unimplemented!()
     }
 
     fn lex<'a>(&mut self, s: TokenIterator<'a>) -> LexResult {
+        // Construct a Vec<Token<'a>> from the TokenIterator, erroring out if a
+        // lexing error is encountered.
         unimplemented!();
     }
 }
