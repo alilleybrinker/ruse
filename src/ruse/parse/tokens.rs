@@ -11,6 +11,14 @@ impl<'a> TokenIterator<'a> {
     }
 }
 
+impl<'a> Iterator for TokenIterator<'a> {
+    type Item = Token<'a>;
+
+    pub fn next(&mut self) -> Option<Self::Item> {
+        unimplemented!()
+    }
+}
+
 pub struct Token<'a> {
     pub kind: TokenKind<'a>,
     pub location: usize,
