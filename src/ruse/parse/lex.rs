@@ -1,17 +1,20 @@
 use parse::{LexResult, TokenIterator};
 use std::cell::Cell;
 
-pub struct Lexer {
+pub struct Lexer<'a> {
     location: Cell<usize>,
+    token_iter: TokenIterator<'a>,
 }
 
-impl Lexer {
-    pub fn new() -> Lexer {
-        Lexer { location: Cell::new(0) }
+impl<'a> Lexer<'a> {
+    pub fn new(s: &str) -> Lexer {
+        Lexer {
+            location: Cell::new(0),
+            token_iter: TokenIterator::new(s),
+        }
     }
 
-    pub fn lex(&self, s: &str) -> LexResult {
-        let token_iter = TokenIterator::new(s);
+    pub fn lex(&self) -> LexResult {
         // Construct a Vec<Token<'a>> from the TokenIterator, erroring out if a
         // lexing error is encountered.
         //

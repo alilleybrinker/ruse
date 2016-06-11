@@ -14,9 +14,14 @@ impl<'a> TokenIterator<'a> {
 impl<'a> Iterator for TokenIterator<'a> {
     type Item = Token<'a>;
 
-    pub fn next(&mut self) -> Option<Self::Item> {
+    fn next(&mut self) -> Option<Self::Item> {
         unimplemented!()
     }
+}
+
+pub enum TokenKind<'a> {
+    Paren,
+    Ident(&'a str),
 }
 
 pub struct Token<'a> {
@@ -41,9 +46,4 @@ impl<'a> Token<'a> {
             span: name.len(),
         }
     }
-}
-
-pub enum TokenKind<'a> {
-    Paren,
-    Ident(&'a str),
 }
