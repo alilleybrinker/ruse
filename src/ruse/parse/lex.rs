@@ -1,24 +1,43 @@
-use parse::{LexResult, TokenIterator};
+use parse::{LexResult, LexError, Token};
 use std::cell::Cell;
+use std::iter::Peekable;
+use std::str::Chars;
 
-pub struct Lexer<'a> {
+pub struct Lexer {
     location: Cell<usize>,
-    token_iter: TokenIterator<'a>,
 }
 
-impl<'a> Lexer<'a> {
-    pub fn new(s: &str) -> Lexer {
-        Lexer {
-            location: Cell::new(0),
-            token_iter: TokenIterator::new(s),
-        }
+impl Lexer {
+    pub fn new() -> Lexer {
+        Lexer { location: Cell::new(0) }
     }
 
-    pub fn lex(&self) -> LexResult {
-        // Construct a Vec<Token<'a>> from the TokenIterator, erroring out if a
-        // lexing error is encountered.
-        //
-        // self.location is used to track where we are in the input stream.
-        unimplemented!();
+    pub fn lex<'a>(&'a self, s: &'a str) -> LexResult {
+        let token_iter = TokenIterator::new(s);
+        token_iter.inspect(|t| {
+                      if let Ok(ref token) = *t {
+                          let old_location = self.location.get();
+                          self.location.set(old_location + token.span);
+                      };
+                  })
+                  .collect::<LexResult>()
+    }
+}
+
+pub struct TokenIterator<'a> {
+    char_iter: Peekable<Chars<'a>>,
+}
+
+impl<'a> TokenIterator<'a> {
+    pub fn new<'b>(s: &'b str) -> TokenIterator<'b> {
+        TokenIterator { char_iter: s.chars().peekable() }
+    }
+}
+
+impl<'a> Iterator for TokenIterator<'a> {
+    type Item = Result<Token<'a>, LexError>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        unimplemented!()
     }
 }

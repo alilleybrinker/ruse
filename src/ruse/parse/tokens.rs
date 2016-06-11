@@ -1,24 +1,3 @@
-use std::iter::Peekable;
-use std::str::Chars;
-
-pub struct TokenIterator<'a> {
-    char_iter: Peekable<Chars<'a>>,
-}
-
-impl<'a> TokenIterator<'a> {
-    pub fn new<'b>(s: &'b str) -> TokenIterator<'b> {
-        TokenIterator { char_iter: s.chars().peekable() }
-    }
-}
-
-impl<'a> Iterator for TokenIterator<'a> {
-    type Item = Token<'a>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        unimplemented!()
-    }
-}
-
 pub enum TokenKind<'a> {
     Paren,
     Ident(&'a str),

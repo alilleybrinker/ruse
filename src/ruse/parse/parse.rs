@@ -27,8 +27,8 @@ impl Parser {
     /// paren is a function call, and that everything after is an atom. This
     /// will obviously become better over time.
     pub fn parse<S: AsRef<str>>(&mut self, s: S) -> ParseResult {
-        let lexer = Lexer::new(s.as_ref());
-        let tokens = try!(lexer.lex());
+        let lexer = Lexer::new();
+        let tokens = try!(lexer.lex(s.as_ref()));
         // Tokens will be a Vec<Token<'a>>, which should then be parsed into a
         // SyntaxTree.
         unimplemented!()
