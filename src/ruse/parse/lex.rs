@@ -14,7 +14,7 @@ impl Lexer {
 
     pub fn lex<'a>(&'a self, s: &'a str) -> LexResult {
         let token_iter = TokenIterator::new(s);
-        token_iter.inspect(|t| {
+        token_iter.inspect(|t: &Result<Token, LexError>| {
                       if let Ok(ref token) = *t {
                           let old_location = self.location.get();
                           self.location.set(old_location + token.span);
