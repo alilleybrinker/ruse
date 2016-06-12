@@ -26,18 +26,46 @@ impl Lexer {
 
 pub struct TokenIterator<'a> {
     char_iter: Peekable<Chars<'a>>,
+    location: Cell<usize>,
 }
+
+pub type TokenResult<'a> = Result<Token<'a>, LexError>;
 
 impl<'a> TokenIterator<'a> {
     pub fn new<'b>(s: &'b str) -> TokenIterator<'b> {
-        TokenIterator { char_iter: s.chars().peekable() }
+        TokenIterator {
+            char_iter: s.chars().peekable(),
+            location: Cell::new(0),
+        }
+    }
+
+    fn parse_ident(&mut self) -> TokenResult {
+        unimplemented!();
+    }
+
+    fn parse_int_literal(&mut self) -> TokenResult {
+        unimplemented!();
+    }
+
+    fn parse_float_literal(&mut self) -> TokenResult {
+        unimplemented!();
     }
 }
 
 impl<'a> Iterator for TokenIterator<'a> {
-    type Item = Result<Token<'a>, LexError>;
+    type Item = TokenResult<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        unimplemented!()
+        while let Some(character) = self.char_iter.next() {
+            let old_location = self.location.get();
+            self.location.set(old_location + 1);
+            match character {
+                '(' => return Some(Ok(Token::open_paren(self.location.get()))),
+                ')' => return Some(Ok(Token::close_paren(self.location.get()))),
+                // Also want to parse identifiers, ints, and floats.
+                _ => unimplemented!(),
+            }
+        }
+        unimplemented!();
     }
 }
