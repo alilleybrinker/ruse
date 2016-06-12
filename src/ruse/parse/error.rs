@@ -7,18 +7,24 @@ pub type ParseResult = Result<SyntaxTree, ParseError>;
 #[derive(Debug)]
 pub enum ParseError {
     BadInput(LexError),
+    NoEnclosingParens,
+    UnmatchedParens,
 }
 
 impl Error for ParseError {
     fn description(&self) -> &str {
         match *self {
             ParseError::BadInput(ref lex_error) => lex_error.description(),
+            ParseError::NoEnclosingParens => "no enclosing parens",
+            ParseError::UnmatchedParens => "unmatched parens",
         }
     }
 
     fn cause(&self) -> Option<&Error> {
         match *self {
             ParseError::BadInput(ref lex_error) => Some(lex_error),
+            ParseError::NoEnclosingParens |
+            ParseError::UnmatchedParens => None,
         }
     }
 }
@@ -39,8 +45,6 @@ pub type LexResult<'a> = Result<Vec<Token<'a>>, LexError>;
 
 #[derive(Debug)]
 pub enum LexError {
-    NoEnclosingParens,
-    UnmatchedParens,
     /// Character and location
     InvalidCharacter(char, i64),
 }
@@ -48,8 +52,6 @@ pub enum LexError {
 impl Error for LexError {
     fn description(&self) -> &str {
         match *self {
-            LexError::NoEnclosingParens => "no enclosing parens",
-            LexError::UnmatchedParens => "unmatched parens",
             LexError::InvalidCharacter(..) => "invalid character",
         }
     }
@@ -58,8 +60,6 @@ impl Error for LexError {
 impl fmt::Display for LexError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            LexError::NoEnclosingParens => write!(f, "no enclosing parens"),
-            LexError::UnmatchedParens => write!(f, "unmatched parens"),
             LexError::InvalidCharacter(character, location) => {
                 write!(f,
                        "invalid character '{}' at column {}",
