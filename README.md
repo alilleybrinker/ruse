@@ -2,8 +2,6 @@
 
 This is an experimental project to create an R7RS small-specification compliant Scheme as an embedded language in Rust, similar to the relationship between Lua and C.
 
-Feel free to ask questions on the #ruse IRC channel on Mozilla IRC.
-
 ## Specification
 
 The goal is for Ruse to be compliant with the R7RS small specification, along with whatever additional features are deemed necessary or desirable.
@@ -29,8 +27,4 @@ All discussions and contributions will be handled via GitHub Issues and Pull Req
 ## Structure
 
 The core of Ruse is implemented as a Rust crate usable by any Rust program, with a binary program providing a command line interface to the crate's functionality.
-
-## Parsing
-
-There are (fantastically) a number of options for parsing in Rust. The most developed of these is Nom, but for Ruse we'll likely be using combine
 
