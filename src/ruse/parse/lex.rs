@@ -132,6 +132,7 @@ impl<'a> Iterator for TokenIterator<'a> {
                 '0'...'9' => return self.parse_number(character),
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
                 '>' | '?' | '^' | '_' | '~' | '+' | '-' => return self.parse_identifier(character),
+                ' ' | '\n' | '\t' | '\r' => (),
                 _ => unreachable!(),
             }
         }
