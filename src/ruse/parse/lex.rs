@@ -39,15 +39,15 @@ impl<'a> TokenIterator<'a> {
         }
     }
 
-    fn parse_open_paren(&self) -> Option<TokenResult> {
-        Some(Ok(Token::open_paren(self.location.get())))
+    fn parse_open_paren(&self) -> TokenResult {
+        Ok(Token::open_paren(self.location.get()))
     }
 
-    fn parse_close_paren(&self) -> Option<TokenResult> {
-        Some(Ok(Token::close_paren(self.location.get())))
+    fn parse_close_paren(&self) -> TokenResult {
+        Ok(Token::close_paren(self.location.get()))
     }
 
-    fn parse_number(&mut self, character: char) -> Option<TokenResult> {
+    fn parse_number(&mut self, character: char) -> TokenResult {
         let mut result = Vec::new();
         let mut is_float = false;
         let mut number_length = 0;
@@ -70,28 +70,26 @@ impl<'a> TokenIterator<'a> {
                 }
                 _ => break,
             }
-
-            let out: String = result.iter().cloned().collect();
-
-            if is_float {
-                if let Ok(val) = out.parse::<f64>() {
-                    let lit = Token::float_literal(val, number_length, self.location.get());
-                    return Some(Ok(lit));
-                }
-            } else {
-                if let Ok(val) = out.parse::<i64>() {
-                    let lit = Token::integer_literal(val, number_length, self.location.get());
-                    return Some(Ok(lit));
-                }
-            }
-
-            return Some(Err(LexError::MalformedNumber(out)));
         }
 
-        None
+        let out: String = result.iter().cloned().collect();
+
+        if is_float {
+            if let Ok(val) = out.parse::<f64>() {
+                let lit = Token::float_literal(val, number_length, self.location.get());
+                return Ok(lit);
+            }
+        } else {
+            if let Ok(val) = out.parse::<i64>() {
+                let lit = Token::integer_literal(val, number_length, self.location.get());
+                return Ok(lit);
+            }
+        }
+
+        Err(LexError::MalformedNumber(out))
     }
 
-    fn parse_identifier(&mut self, character: char) -> Option<TokenResult> {
+    fn parse_identifier(&mut self, character: char) -> TokenResult {
         let mut result = Vec::new();
         result.push(character);
 
@@ -107,12 +105,10 @@ impl<'a> TokenIterator<'a> {
                 }
                 _ => break,
             }
-
-            let out: String = result.iter().cloned().collect();
-            return Some(Ok(Token::ident(out, self.location.get())));
         }
 
-        None
+        let out: String = result.iter().cloned().collect();
+        Ok(Token::ident(out, self.location.get()))
     }
 }
 
@@ -125,11 +121,13 @@ impl<'a> Iterator for TokenIterator<'a> {
             self.location.set(old_location + 1);
 
             match character {
-                '(' => return self.parse_open_paren(),
-                ')' => return self.parse_close_paren(),
-                '0'...'9' => return self.parse_number(character),
+                '(' => return Some(self.parse_open_paren()),
+                ')' => return Some(self.parse_close_paren()),
+                '0'...'9' => return Some(self.parse_number(character)),
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
-                '>' | '?' | '^' | '_' | '~' | '+' | '-' => return self.parse_identifier(character),
+                '>' | '?' | '^' | '_' | '~' | '+' | '-' => {
+                    return Some(self.parse_identifier(character))
+                }
                 ' ' | '\n' | '\t' | '\r' => (),
                 _ => unreachable!(),
             }
