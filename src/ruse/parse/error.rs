@@ -47,12 +47,14 @@ pub type LexResult<'a> = Result<Vec<Token<'a>>, LexError>;
 pub enum LexError {
     /// Character and location
     InvalidCharacter(char, i64),
+    MalformedNumber(String),
 }
 
 impl Error for LexError {
     fn description(&self) -> &str {
         match *self {
             LexError::InvalidCharacter(..) => "invalid character",
+            LexError::MalformedNumber(..) => "malformed number",
         }
     }
 }
@@ -66,6 +68,7 @@ impl fmt::Display for LexError {
                        character,
                        location)
             }
+            LexError::MalformedNumber(ref number) => write!(f, "malformed number: {}", number),
         }
     }
 }
