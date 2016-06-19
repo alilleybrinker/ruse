@@ -121,11 +121,9 @@ impl<'a> Iterator for TokenIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(character) = self.char_iter.next() {
-            // Update location.
             let old_location = self.location.get();
             self.location.set(old_location + 1);
 
-            // Figure out what the next type of token is.
             match character {
                 '(' => return self.parse_open_paren(),
                 ')' => return self.parse_close_paren(),

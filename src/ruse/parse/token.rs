@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub enum TokenKind {
     OpenParen,
     CloseParen,
@@ -6,6 +7,7 @@ pub enum TokenKind {
     FloatLiteral(f64),
 }
 
+#[derive(Debug)]
 pub struct Token {
     pub kind: TokenKind,
     pub location: usize,
