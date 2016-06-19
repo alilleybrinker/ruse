@@ -1,19 +1,19 @@
-pub enum TokenKind<'a> {
+pub enum TokenKind {
     OpenParen,
     CloseParen,
-    Ident(&'a str),
+    Ident(String),
     IntegerLiteral(i64),
     FloatLiteral(f64),
 }
 
-pub struct Token<'a> {
-    pub kind: TokenKind<'a>,
+pub struct Token {
+    pub kind: TokenKind,
     pub location: usize,
     pub span: usize,
 }
 
-impl<'a> Token<'a> {
-    pub fn open_paren(location: usize) -> Token<'a> {
+impl Token {
+    pub fn open_paren(location: usize) -> Token {
         Token {
             kind: TokenKind::OpenParen,
             location: location,
@@ -21,7 +21,7 @@ impl<'a> Token<'a> {
         }
     }
 
-    pub fn close_paren(location: usize) -> Token<'a> {
+    pub fn close_paren(location: usize) -> Token {
         Token {
             kind: TokenKind::CloseParen,
             location: location,
@@ -29,15 +29,16 @@ impl<'a> Token<'a> {
         }
     }
 
-    pub fn ident(name: &'a str, location: usize) -> Token<'a> {
+    pub fn ident(name: String, location: usize) -> Token {
+        let len = name.len();
         Token {
             kind: TokenKind::Ident(name),
             location: location,
-            span: name.len(),
+            span: len,
         }
     }
 
-    pub fn integer_literal(value: i64, span: usize, location: usize) -> Token<'a> {
+    pub fn integer_literal(value: i64, span: usize, location: usize) -> Token {
         Token {
             kind: TokenKind::IntegerLiteral(value),
             location: location,
@@ -45,7 +46,7 @@ impl<'a> Token<'a> {
         }
     }
 
-    pub fn float_literal(value: f64, span: usize, location: usize) -> Token<'a> {
+    pub fn float_literal(value: f64, span: usize, location: usize) -> Token {
         Token {
             kind: TokenKind::FloatLiteral(value),
             location: location,

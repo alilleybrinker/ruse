@@ -41,7 +41,7 @@ impl From<LexError> for ParseError {
     }
 }
 
-pub type LexResult<'a> = Result<Vec<Token<'a>>, LexError>;
+pub type LexResult = Result<Vec<Token>, LexError>;
 
 #[derive(Debug)]
 pub enum LexError {

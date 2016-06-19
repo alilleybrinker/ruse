@@ -29,7 +29,7 @@ pub struct TokenIterator<'a> {
     location: Cell<usize>,
 }
 
-pub type TokenResult<'a> = Result<Token<'a>, LexError>;
+pub type TokenResult = Result<Token, LexError>;
 
 impl<'a> TokenIterator<'a> {
     pub fn new<'b>(s: &'b str) -> TokenIterator<'b> {
@@ -39,21 +39,24 @@ impl<'a> TokenIterator<'a> {
         }
     }
 
-    fn parse_open_paren(&self) -> Option<TokenResult<'a>> {
+    fn parse_open_paren(&self) -> Option<TokenResult> {
         Some(Ok(Token::open_paren(self.location.get())))
     }
 
-    fn parse_close_paren(&self) -> Option<TokenResult<'a>> {
+    fn parse_close_paren(&self) -> Option<TokenResult> {
         Some(Ok(Token::close_paren(self.location.get())))
     }
 
-    fn parse_number(&mut self, character: char) -> Option<TokenResult<'a>> {
+    fn parse_number(&mut self, character: char) -> Option<TokenResult> {
         let mut result = Vec::new();
         let mut is_float = false;
         let mut number_length = 0;
         result.push(character);
 
         while let Some(&next_character) = self.char_iter.peek() {
+            let old_location = self.location.get();
+            self.location.set(old_location + 1);
+
             number_length += 1;
             match next_character {
                 '0'...'9' => {
@@ -87,10 +90,34 @@ impl<'a> TokenIterator<'a> {
 
         None
     }
+
+    fn parse_identifier(&mut self, character: char) -> Option<TokenResult> {
+        let mut result = Vec::new();
+        result.push(character);
+
+        while let Some(&next_character) = self.char_iter.peek() {
+            let old_location = self.location.get();
+            self.location.set(old_location + 1);
+
+            match next_character {
+                'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
+                '>' | '?' | '^' | '_' | '~' | '0'...'9' | '+' | '-' | '.' | '@' => {
+                    result.push(next_character);
+                    self.char_iter.next();
+                }
+                _ => break,
+            }
+
+            let out: String = result.iter().cloned().collect();
+            return Some(Ok(Token::ident(out, self.location.get())));
+        }
+
+        None
+    }
 }
 
 impl<'a> Iterator for TokenIterator<'a> {
-    type Item = TokenResult<'a>;
+    type Item = TokenResult;
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(character) = self.char_iter.next() {
@@ -103,8 +130,9 @@ impl<'a> Iterator for TokenIterator<'a> {
                 '(' => return self.parse_open_paren(),
                 ')' => return self.parse_close_paren(),
                 '0'...'9' => return self.parse_number(character),
-                // Also want to parse identifiers
-                _ => {}
+                'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
+                '>' | '?' | '^' | '_' | '~' | '+' | '-' => return self.parse_identifier(character),
+                _ => unreachable!(),
             }
         }
 
