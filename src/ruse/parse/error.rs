@@ -1,6 +1,5 @@
 use parse::SyntaxTree;
 use lex::LexError;
-
 use std::error::Error;
 use std::fmt;
 

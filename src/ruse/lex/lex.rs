@@ -1,5 +1,4 @@
 use lex::{LexResult, LexError, Token};
-
 use std::cell::Cell;
 use std::iter::Peekable;
 use std::str::Chars;
