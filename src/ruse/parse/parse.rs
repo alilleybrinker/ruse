@@ -1,4 +1,5 @@
-use parse::{ParseResult, Lexer};
+use parse::ParseResult;
+use lex::Lexer;
 
 pub struct Parser {}
 

@@ -1,4 +1,5 @@
-use parse::{LexResult, LexError, Token};
+use lex::{LexResult, LexError, Token};
+
 use std::cell::Cell;
 use std::iter::Peekable;
 use std::str::Chars;
@@ -106,6 +107,15 @@ impl<'a> TokenIterator<'a> {
 impl<'a> Iterator for TokenIterator<'a> {
     type Item = TokenResult;
 
+    /// Returns one of three things:
+    ///
+    /// 1. `Option::None`
+    /// 2. `Option::Some(Result::Err(LexError))`
+    /// 3. `Option::Some(Result::Ok(Token))`
+    ///
+    /// Option (1) indicates that there's nothing left to parse. Option (2)
+    /// indicates an error in the input stream. Option (3) is how the parsed
+    /// tokens are returned to the user.
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(character) = self.char_iter.next() {
             self.increment_location();
