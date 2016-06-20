@@ -30,9 +30,7 @@ impl Parser {
         let lexer = Lexer::new();
         let tokens = try!(lexer.lex(s.as_ref()));
 
-        println!("{:?}", tokens);
-
-        // Tokens will be a Vec<Token<'a>>, which should then be parsed into a
+        // Tokens will be a Vec<Token>, which should then be parsed into a
         // SyntaxTree.
         unimplemented!()
     }
