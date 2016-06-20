@@ -117,9 +117,6 @@ impl<'a> Iterator for TokenIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(character) = self.char_iter.next() {
-            let old_location = self.location.get();
-            self.location.set(old_location + 1);
-
             match character {
                 '(' => return Some(self.parse_open_paren()),
                 ')' => return Some(self.parse_close_paren()),
@@ -131,6 +128,9 @@ impl<'a> Iterator for TokenIterator<'a> {
                 ' ' | '\n' | '\t' | '\r' => (),
                 _ => unreachable!(),
             }
+
+            let old_location = self.location.get();
+            self.location.set(old_location + 1);
         }
 
         None
