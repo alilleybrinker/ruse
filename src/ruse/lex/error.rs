@@ -8,7 +8,7 @@ pub type LexResult = Result<Vec<Token>, LexError>;
 #[derive(Debug)]
 pub enum LexError {
     /// Character and location
-    InvalidCharacter(char, i64),
+    InvalidCharacter(char, usize),
     MalformedNumber(String),
 }
 

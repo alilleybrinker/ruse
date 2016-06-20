@@ -95,7 +95,8 @@ impl<'a> TokenIterator<'a> {
                     result.push(next_character);
                     self.char_iter.next();
                 }
-                _ => break,
+                ' ' | '\n' | '\t' | '\r' => break,
+                _ => return Err(LexError::InvalidCharacter(next_character, self.location.get())),
             }
         }
 
