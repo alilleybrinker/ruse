@@ -27,6 +27,7 @@ impl Lexer {
 pub struct TokenIterator<'a> {
     char_iter: Peekable<Chars<'a>>,
     location: Cell<usize>,
+    first: Cell<bool>,
 }
 
 pub type TokenResult = Result<Token, LexError>;
@@ -36,6 +37,7 @@ impl<'a> TokenIterator<'a> {
         TokenIterator {
             char_iter: s.chars().peekable(),
             location: Cell::new(0),
+            first: Cell::new(true),
         }
     }
 
@@ -50,20 +52,24 @@ impl<'a> TokenIterator<'a> {
     fn parse_number(&mut self, character: char) -> TokenResult {
         let mut result = Vec::new();
         let mut is_float = false;
-        let mut number_length = 0;
+        let mut number_length = 1;
         result.push(character);
 
         while let Some(&next_character) = self.char_iter.peek() {
-            let old_location = self.location.get();
-            self.location.set(old_location + 1);
-
-            number_length += 1;
             match next_character {
                 '0'...'9' => {
+                    let old_location = self.location.get();
+                    self.location.set(old_location + 1);
+                    number_length += 1;
+
                     result.push(next_character);
                     self.char_iter.next();
                 }
                 '.' => {
+                    let old_location = self.location.get();
+                    self.location.set(old_location + 1);
+                    number_length += 1;
+
                     result.push(next_character);
                     self.char_iter.next();
                     is_float = true;
@@ -94,12 +100,12 @@ impl<'a> TokenIterator<'a> {
         result.push(character);
 
         while let Some(&next_character) = self.char_iter.peek() {
-            let old_location = self.location.get();
-            self.location.set(old_location + 1);
-
             match next_character {
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
                 '>' | '?' | '^' | '_' | '~' | '0'...'9' | '+' | '-' | '.' | '@' => {
+                    let old_location = self.location.get();
+                    self.location.set(old_location + 1);
+
                     result.push(next_character);
                     self.char_iter.next();
                 }
@@ -117,6 +123,14 @@ impl<'a> Iterator for TokenIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(character) = self.char_iter.next() {
+            let old_location = self.location.get();
+            self.location.set(old_location + 1);
+
+            if self.first.get() {
+                self.location.set(0);
+                self.first.set(false);
+            }
+
             match character {
                 '(' => return Some(self.parse_open_paren()),
                 ')' => return Some(self.parse_close_paren()),
@@ -128,9 +142,6 @@ impl<'a> Iterator for TokenIterator<'a> {
                 ' ' | '\n' | '\t' | '\r' => (),
                 _ => unreachable!(),
             }
-
-            let old_location = self.location.get();
-            self.location.set(old_location + 1);
         }
 
         None
