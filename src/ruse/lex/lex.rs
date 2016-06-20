@@ -3,49 +3,55 @@ use std::cell::Cell;
 use std::iter::Peekable;
 use std::str::Chars;
 
+/// Lexes an input string to get a vector of tokens from it.
 pub struct Lexer {}
 
 impl Lexer {
+    /// Get a new Lexer.
     pub fn new() -> Lexer {
         Lexer {}
     }
 
-    pub fn lex<'a>(&'a self, s: &'a str) -> LexResult {
+    /// Get a vector of tokens from the given string, or a LexError if there's
+    /// something wrong with the input stream.
+    pub fn lex(&self, s: &str) -> LexResult {
         TokenIterator::new(s).collect::<LexResult>()
     }
 }
 
+/// Iterator over tokens in a string.
 pub struct TokenIterator<'a> {
     char_iter: Peekable<Chars<'a>>,
     location: Cell<usize>,
-    first: Cell<bool>,
 }
 
-pub type TokenResult = Result<Token, LexError>;
-
 impl<'a> TokenIterator<'a> {
+    /// Create a new TokenIterator to iterate over the given string.
     pub fn new<'b>(s: &'b str) -> TokenIterator<'b> {
         TokenIterator {
             char_iter: s.chars().peekable(),
             location: Cell::new(0),
-            first: Cell::new(true),
         }
     }
 
+    /// Increment the iterator's internal location field.
     fn increment_location(&self) {
         let old_location = self.location.get();
         self.location.set(old_location + 1);
     }
 
-    fn parse_open_paren(&self) -> TokenResult {
+    /// Parse an open parenthese.
+    fn parse_open_paren(&self) -> Result<Token, LexError> {
         Ok(Token::open_paren(self.location.get()))
     }
 
-    fn parse_close_paren(&self) -> TokenResult {
+    /// Parse a closed parenthese.
+    fn parse_close_paren(&self) -> Result<Token, LexError> {
         Ok(Token::close_paren(self.location.get()))
     }
 
-    fn parse_number(&mut self, character: char) -> TokenResult {
+    /// Parse a number, either floating point or integer.
+    fn parse_number(&mut self, character: char) -> Result<Token, LexError> {
         let mut len = 1;
         let mut result = Vec::new();
         result.push(character);
@@ -81,7 +87,8 @@ impl<'a> TokenIterator<'a> {
         Err(LexError::MalformedNumber(out))
     }
 
-    fn parse_identifier(&mut self, character: char) -> TokenResult {
+    /// Parse an identifier.
+    fn parse_identifier(&mut self, character: char) -> Result<Token, LexError> {
         let mut result = Vec::new();
         result.push(character);
 
@@ -105,7 +112,7 @@ impl<'a> TokenIterator<'a> {
 }
 
 impl<'a> Iterator for TokenIterator<'a> {
-    type Item = TokenResult;
+    type Item = Result<Token, LexError>;
 
     /// Returns one of three things:
     ///
@@ -119,11 +126,6 @@ impl<'a> Iterator for TokenIterator<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(character) = self.char_iter.next() {
             self.increment_location();
-
-            if self.first.get() {
-                self.location.set(0);
-                self.first.set(false);
-            }
 
             match character {
                 '(' => return Some(self.parse_open_paren()),
