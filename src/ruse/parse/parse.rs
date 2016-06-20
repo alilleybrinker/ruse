@@ -19,6 +19,10 @@ impl Parser {
     ///
     /// Becomes:
     ///
+    ///     [<open_paren>, <ident:+>, <int_literal: 2>, <int_literal: 3>, <close_paren>]
+    ///
+    /// Becomes:
+    ///
     ///         <fn: '+'>
     ///         /       \
     /// <atom: 2>       <atom: 3>

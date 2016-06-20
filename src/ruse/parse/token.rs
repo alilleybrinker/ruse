@@ -40,7 +40,7 @@ impl Token {
         }
     }
 
-    pub fn integer_literal(value: i64, span: usize, location: usize) -> Token {
+    pub fn integer(value: i64, span: usize, location: usize) -> Token {
         Token {
             kind: TokenKind::IntegerLiteral(value),
             location: location,
@@ -48,7 +48,7 @@ impl Token {
         }
     }
 
-    pub fn float_literal(value: f64, span: usize, location: usize) -> Token {
+    pub fn float(value: f64, span: usize, location: usize) -> Token {
         Token {
             kind: TokenKind::FloatLiteral(value),
             location: location,

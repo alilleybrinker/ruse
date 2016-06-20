@@ -3,24 +3,15 @@ use std::cell::Cell;
 use std::iter::Peekable;
 use std::str::Chars;
 
-pub struct Lexer {
-    location: Cell<usize>,
-}
+pub struct Lexer {}
 
 impl Lexer {
     pub fn new() -> Lexer {
-        Lexer { location: Cell::new(0) }
+        Lexer {}
     }
 
     pub fn lex<'a>(&'a self, s: &'a str) -> LexResult {
-        let token_iter = TokenIterator::new(s);
-        token_iter.inspect(|t: &Result<Token, LexError>| {
-                      if let Ok(ref token) = *t {
-                          let old_location = self.location.get();
-                          self.location.set(old_location + token.span);
-                      };
-                  })
-                  .collect::<LexResult>()
+        TokenIterator::new(s).collect::<LexResult>()
     }
 }
 
@@ -41,6 +32,11 @@ impl<'a> TokenIterator<'a> {
         }
     }
 
+    fn increment_location(&self) {
+        let old_location = self.location.get();
+        self.location.set(old_location + 1);
+    }
+
     fn parse_open_paren(&self) -> TokenResult {
         Ok(Token::open_paren(self.location.get()))
     }
@@ -50,29 +46,23 @@ impl<'a> TokenIterator<'a> {
     }
 
     fn parse_number(&mut self, character: char) -> TokenResult {
+        let mut len = 1;
         let mut result = Vec::new();
-        let mut is_float = false;
-        let mut number_length = 1;
         result.push(character);
 
         while let Some(&next_character) = self.char_iter.peek() {
             match next_character {
                 '0'...'9' => {
-                    let old_location = self.location.get();
-                    self.location.set(old_location + 1);
-                    number_length += 1;
-
+                    self.increment_location();
+                    len += 1;
                     result.push(next_character);
                     self.char_iter.next();
                 }
                 '.' => {
-                    let old_location = self.location.get();
-                    self.location.set(old_location + 1);
-                    number_length += 1;
-
+                    self.increment_location();
+                    len += 1;
                     result.push(next_character);
                     self.char_iter.next();
-                    is_float = true;
                 }
                 _ => break,
             }
@@ -80,16 +70,12 @@ impl<'a> TokenIterator<'a> {
 
         let out: String = result.iter().cloned().collect();
 
-        if is_float {
-            if let Ok(val) = out.parse::<f64>() {
-                let lit = Token::float_literal(val, number_length, self.location.get());
-                return Ok(lit);
-            }
-        } else {
-            if let Ok(val) = out.parse::<i64>() {
-                let lit = Token::integer_literal(val, number_length, self.location.get());
-                return Ok(lit);
-            }
+        if let Ok(val) = out.parse::<i64>() {
+            return Ok(Token::integer(val, len, self.location.get()));
+        }
+
+        if let Ok(val) = out.parse::<f64>() {
+            return Ok(Token::float(val, len, self.location.get()));
         }
 
         Err(LexError::MalformedNumber(out))
@@ -103,8 +89,7 @@ impl<'a> TokenIterator<'a> {
             match next_character {
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
                 '>' | '?' | '^' | '_' | '~' | '0'...'9' | '+' | '-' | '.' | '@' => {
-                    let old_location = self.location.get();
-                    self.location.set(old_location + 1);
+                    self.increment_location();
 
                     result.push(next_character);
                     self.char_iter.next();
@@ -123,8 +108,7 @@ impl<'a> Iterator for TokenIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(character) = self.char_iter.next() {
-            let old_location = self.location.get();
-            self.location.set(old_location + 1);
+            self.increment_location();
 
             if self.first.get() {
                 self.location.set(0);
