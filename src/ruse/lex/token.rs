@@ -1,11 +1,18 @@
+//! A single lexical item.
+
 /// The different types of Token. Some token kinds require additional data,
 /// and will carry it here.
 #[derive(Debug)]
 pub enum TokenKind {
+    /// A single open parenthese.
     OpenParen,
+    /// A single closed parenthese.
     CloseParen,
+    /// An identifier.
     Ident(String),
+    /// An integer literal.
     IntegerLiteral(i64),
+    /// A floating point literal.
     FloatLiteral(f64),
 }
 
@@ -14,8 +21,11 @@ pub enum TokenKind {
 /// has some associated data.
 #[derive(Debug)]
 pub struct Token {
+    /// The kind of token, potentially with some additional data.
     pub kind: TokenKind,
+    /// The location of the token in the input stream.
     pub location: usize,
+    /// The width of the token in the input stream.
     pub span: usize,
 }
 

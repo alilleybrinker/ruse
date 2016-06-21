@@ -1,3 +1,5 @@
+//! Get a vector of tokens from an input string.
+
 pub mod error;
 pub mod lex;
 pub mod token;

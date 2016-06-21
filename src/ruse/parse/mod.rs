@@ -1,3 +1,5 @@
+//! Generate a syntax tree from an input stream.
+
 pub mod error;
 pub mod parse;
 pub mod syntax_tree;

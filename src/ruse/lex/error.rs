@@ -1,3 +1,5 @@
+//! Lexing error and result types.
+
 use lex::Token;
 use std::error;
 use std::fmt;
@@ -18,6 +20,7 @@ pub enum Error {
 }
 
 impl error::Error for Error {
+    /// Get a simple text description of what each error means.
     fn description(&self) -> &str {
         match *self {
             Error::InvalidCharacter(..) => "invalid character",
@@ -27,6 +30,7 @@ impl error::Error for Error {
 }
 
 impl fmt::Display for Error {
+    /// Print detailed error information.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Error::InvalidCharacter(character, location) => {

@@ -1,11 +1,16 @@
+//! An iterator for parsing tokens from an input stream.
+
 use lex::{self, Token};
 use std::cell::Cell;
 use std::iter::Peekable;
 use std::str::Chars;
 use std::iter::Iterator;
 
+/// An iterator over the tokens in an input string.
 pub struct Tokenize<'a> {
+    /// A peekable iterator over the characters in the original string.
     char_iter: Peekable<Chars<'a>>,
+    /// The location of the iterator in the input stream.
     location: Cell<usize>,
 }
 
@@ -96,6 +101,7 @@ impl<'a> Tokenize<'a> {
 }
 
 impl<'a> Iterator for Tokenize<'a> {
+    /// Returns either a Token or a lexing error.
     type Item = Result<Token, lex::Error>;
 
     /// Returns one of three things:
@@ -128,7 +134,9 @@ impl<'a> Iterator for Tokenize<'a> {
     }
 }
 
+/// Extend a stringy type with the ability to generate tokens.
 pub trait IterExt: AsRef<str> {
+    /// Convenience method to get a token iterator for a string.
     fn tokens<'a>(&'a self) -> Tokenize<'a> {
         Tokenize::new(self.as_ref())
     }

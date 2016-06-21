@@ -1,9 +1,13 @@
+//! Generate a syntax tree from an input stream.
+
 use parse;
 use lex::Lexer;
 
+/// Parse an input string, returning a syntax tree that can be evaluated.
 pub struct Parser {}
 
 impl Parser {
+    /// Get a new Parser.
     pub fn new() -> Parser {
         Parser {}
     }
