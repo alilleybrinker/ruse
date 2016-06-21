@@ -1,4 +1,4 @@
-use parse::ParseResult;
+use parse;
 use lex::Lexer;
 
 pub struct Parser {}
@@ -31,7 +31,7 @@ impl Parser {
     /// For now, this is done by assuming that the first item after an open
     /// paren is a function call, and that everything after is an atom. This
     /// will obviously become better over time.
-    pub fn parse<S: AsRef<str>>(&mut self, s: S) -> ParseResult {
+    pub fn parse<S: AsRef<str>>(&mut self, s: S) -> parse::Result {
         let lexer = Lexer::new();
         let tokens = try!(lexer.lex(s.as_ref()));
 

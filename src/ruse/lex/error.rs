@@ -1,35 +1,41 @@
 use lex::Token;
-use std::error::Error;
+use std::error;
 use std::fmt;
+use std::result;
 
-pub type LexResult = Result<Vec<Token>, LexError>;
+/// The result of lexing. Either a vector of tokens if the lexing is successful
+/// or an Error if it's not.
+pub type Result = result::Result<Vec<Token>, Error>;
 
+/// A lexing error, indicating some problem with the contents of the input
+/// stream.
 #[derive(Debug)]
-pub enum LexError {
+pub enum Error {
     /// Character and location
     InvalidCharacter(char, usize),
+    /// The almost-number.
     MalformedNumber(String),
 }
 
-impl Error for LexError {
+impl error::Error for Error {
     fn description(&self) -> &str {
         match *self {
-            LexError::InvalidCharacter(..) => "invalid character",
-            LexError::MalformedNumber(..) => "malformed number",
+            Error::InvalidCharacter(..) => "invalid character",
+            Error::MalformedNumber(..) => "malformed number",
         }
     }
 }
 
-impl fmt::Display for LexError {
+impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            LexError::InvalidCharacter(character, location) => {
+            Error::InvalidCharacter(character, location) => {
                 write!(f,
                        "invalid character '{}' at column {}",
                        character,
                        location)
             }
-            LexError::MalformedNumber(ref number) => write!(f, "malformed number: {}", number),
+            Error::MalformedNumber(ref number) => write!(f, "malformed number: {}", number),
         }
     }
 }

@@ -1,4 +1,4 @@
-use lex::{LexResult, LexError, Token};
+use lex;
 use std::cell::Cell;
 use std::iter::Peekable;
 use std::str::Chars;
@@ -12,10 +12,10 @@ impl Lexer {
         Lexer {}
     }
 
-    /// Get a vector of tokens from the given string, or a LexError if there's
+    /// Get a vector of tokens from the given string, or a lex::Error if there's
     /// something wrong with the input stream.
-    pub fn lex(&self, s: &str) -> LexResult {
-        TokenIterator::new(s).collect::<LexResult>()
+    pub fn lex(&self, s: &str) -> lex::Result {
+        TokenIterator::new(s).collect::<lex::Result>()
     }
 }
 
@@ -41,17 +41,17 @@ impl<'a> TokenIterator<'a> {
     }
 
     /// Parse an open parenthese.
-    fn parse_open_paren(&self) -> Result<Token, LexError> {
-        Ok(Token::open_paren(self.location.get()))
+    fn parse_open_paren(&self) -> Result<lex::Token, lex::Error> {
+        Ok(lex::Token::open_paren(self.location.get()))
     }
 
     /// Parse a closed parenthese.
-    fn parse_close_paren(&self) -> Result<Token, LexError> {
-        Ok(Token::close_paren(self.location.get()))
+    fn parse_close_paren(&self) -> Result<lex::Token, lex::Error> {
+        Ok(lex::Token::close_paren(self.location.get()))
     }
 
     /// Parse a number, either floating point or integer.
-    fn parse_number(&mut self, character: char) -> Result<Token, LexError> {
+    fn parse_number(&mut self, character: char) -> Result<lex::Token, lex::Error> {
         let mut len = 1;
         let mut result = Vec::new();
         result.push(character);
@@ -77,18 +77,18 @@ impl<'a> TokenIterator<'a> {
         let out: String = result.iter().cloned().collect();
 
         if let Ok(val) = out.parse::<i64>() {
-            return Ok(Token::integer(val, len, self.location.get()));
+            return Ok(lex::Token::integer(val, len, self.location.get()));
         }
 
         if let Ok(val) = out.parse::<f64>() {
-            return Ok(Token::float(val, len, self.location.get()));
+            return Ok(lex::Token::float(val, len, self.location.get()));
         }
 
-        Err(LexError::MalformedNumber(out))
+        Err(lex::Error::MalformedNumber(out))
     }
 
     /// Parse an identifier.
-    fn parse_identifier(&mut self, character: char) -> Result<Token, LexError> {
+    fn parse_identifier(&mut self, character: char) -> Result<lex::Token, lex::Error> {
         let mut result = Vec::new();
         result.push(character);
 
@@ -102,23 +102,23 @@ impl<'a> TokenIterator<'a> {
                     self.char_iter.next();
                 }
                 ' ' | '\n' | '\t' | '\r' => break,
-                _ => return Err(LexError::InvalidCharacter(next_character, self.location.get())),
+                _ => return Err(lex::Error::InvalidCharacter(next_character, self.location.get())),
             }
         }
 
         let out: String = result.iter().cloned().collect();
-        Ok(Token::ident(out, self.location.get()))
+        Ok(lex::Token::ident(out, self.location.get()))
     }
 }
 
 impl<'a> Iterator for TokenIterator<'a> {
-    type Item = Result<Token, LexError>;
+    type Item = Result<lex::Token, lex::Error>;
 
     /// Returns one of three things:
     ///
     /// 1. `Option::None`
-    /// 2. `Option::Some(Result::Err(LexError))`
-    /// 3. `Option::Some(Result::Ok(Token))`
+    /// 2. `Option::Some(Result::Err(lex::Error))`
+    /// 3. `Option::Some(Result::Ok(lex::Token))`
     ///
     /// Option (1) indicates that there's nothing left to parse. Option (2)
     /// indicates an error in the input stream. Option (3) is how the parsed

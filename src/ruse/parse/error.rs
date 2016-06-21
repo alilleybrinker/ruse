@@ -1,43 +1,43 @@
+use lex;
 use parse::SyntaxTree;
-use lex::LexError;
-use std::error::Error;
+use std::error;
 use std::fmt;
+use std::result;
 
-pub type ParseResult = Result<SyntaxTree, ParseError>;
+pub type Result = result::Result<SyntaxTree, Error>;
 
 #[derive(Debug)]
-pub enum ParseError {
-    BadInput(LexError),
+pub enum Error {
+    BadInput(lex::Error),
     NoEnclosingParens,
     UnmatchedParens,
 }
 
-impl Error for ParseError {
+impl error::Error for Error {
     fn description(&self) -> &str {
         match *self {
-            ParseError::BadInput(ref lex_error) => lex_error.description(),
-            ParseError::NoEnclosingParens => "no enclosing parens",
-            ParseError::UnmatchedParens => "unmatched parens",
+            Error::BadInput(ref lex_error) => lex_error.description(),
+            Error::NoEnclosingParens => "no enclosing parens",
+            Error::UnmatchedParens => "unmatched parens",
         }
     }
 
-    fn cause(&self) -> Option<&Error> {
+    fn cause(&self) -> Option<&error::Error> {
         match *self {
-            ParseError::BadInput(ref lex_error) => Some(lex_error),
-            ParseError::NoEnclosingParens |
-            ParseError::UnmatchedParens => None,
+            Error::BadInput(ref lex_error) => Some(lex_error),
+            Error::NoEnclosingParens | Error::UnmatchedParens => None,
         }
     }
 }
 
-impl fmt::Display for ParseError {
+impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.description())
+        write!(f, "{}", (self as &error::Error).description())
     }
 }
 
-impl From<LexError> for ParseError {
-    fn from(err: LexError) -> ParseError {
-        ParseError::BadInput(err)
+impl From<lex::Error> for Error {
+    fn from(err: lex::Error) -> Error {
+        Error::BadInput(err)
     }
 }

@@ -1,4 +1,4 @@
-use parse::{Parser, ParseError};
+use parse::{self, Parser};
 
 // Eventually the Engine will store all Rust-side function bindings, and
 // provide a way for the user to register new bindings. There will also
@@ -16,7 +16,7 @@ impl Engine {
     // EvalError would probably be a wrapper around ParseError, along with some
     // of its own failure variants, most notably failed function lookup,
     // incorrect number of arguments, and invalid operation (type issues).
-    pub fn eval<S: AsRef<str>>(&mut self, s: S) -> Result<String, ParseError> {
+    pub fn eval<S: AsRef<str>>(&mut self, s: S) -> Result<String, parse::Error> {
         let mut parser = Parser::new();
         let result: String = try!(parser.parse(s.as_ref())).into();
         Ok(result)
