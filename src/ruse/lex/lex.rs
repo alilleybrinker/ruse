@@ -1,4 +1,4 @@
-use lex;
+use lex::{self, Token};
 use std::cell::Cell;
 use std::iter::Peekable;
 use std::str::Chars;
@@ -41,17 +41,17 @@ impl<'a> TokenIterator<'a> {
     }
 
     /// Parse an open parenthese.
-    fn parse_open_paren(&self) -> Result<lex::Token, lex::Error> {
-        Ok(lex::Token::open_paren(self.location.get()))
+    fn parse_open_paren(&self) -> Result<Token, lex::Error> {
+        Ok(Token::open_paren(self.location.get()))
     }
 
     /// Parse a closed parenthese.
-    fn parse_close_paren(&self) -> Result<lex::Token, lex::Error> {
-        Ok(lex::Token::close_paren(self.location.get()))
+    fn parse_close_paren(&self) -> Result<Token, lex::Error> {
+        Ok(Token::close_paren(self.location.get()))
     }
 
     /// Parse a number, either floating point or integer.
-    fn parse_number(&mut self, character: char) -> Result<lex::Token, lex::Error> {
+    fn parse_number(&mut self, character: char) -> Result<Token, lex::Error> {
         let mut len = 1;
         let mut result = Vec::new();
         result.push(character);
@@ -77,18 +77,18 @@ impl<'a> TokenIterator<'a> {
         let out: String = result.iter().cloned().collect();
 
         if let Ok(val) = out.parse::<i64>() {
-            return Ok(lex::Token::integer(val, len, self.location.get()));
+            return Ok(Token::integer(val, len, self.location.get()));
         }
 
         if let Ok(val) = out.parse::<f64>() {
-            return Ok(lex::Token::float(val, len, self.location.get()));
+            return Ok(Token::float(val, len, self.location.get()));
         }
 
         Err(lex::Error::MalformedNumber(out))
     }
 
     /// Parse an identifier.
-    fn parse_identifier(&mut self, character: char) -> Result<lex::Token, lex::Error> {
+    fn parse_identifier(&mut self, character: char) -> Result<Token, lex::Error> {
         let mut result = Vec::new();
         result.push(character);
 
@@ -107,18 +107,18 @@ impl<'a> TokenIterator<'a> {
         }
 
         let out: String = result.iter().cloned().collect();
-        Ok(lex::Token::ident(out, self.location.get()))
+        Ok(Token::ident(out, self.location.get()))
     }
 }
 
 impl<'a> Iterator for TokenIterator<'a> {
-    type Item = Result<lex::Token, lex::Error>;
+    type Item = Result<Token, lex::Error>;
 
     /// Returns one of three things:
     ///
     /// 1. `Option::None`
     /// 2. `Option::Some(Result::Err(lex::Error))`
-    /// 3. `Option::Some(Result::Ok(lex::Token))`
+    /// 3. `Option::Some(Result::Ok(Token))`
     ///
     /// Option (1) indicates that there's nothing left to parse. Option (2)
     /// indicates an error in the input stream. Option (3) is how the parsed
