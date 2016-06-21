@@ -32,9 +32,7 @@ impl Parser {
     /// paren is a function call, and that everything after is an atom. This
     /// will obviously become better over time.
     pub fn parse<S: AsRef<str>>(&mut self, s: S) -> parse::Result {
-        let lexer = Lexer::new();
-        let tokens = try!(lexer.lex(s.as_ref()));
-
+        let tokens = try!(Lexer::lex(s.as_ref()));
         println!("{:?} {:?}", s.as_ref(), tokens);
 
         // Tokens will be a Vec<Token>, which should then be parsed into a

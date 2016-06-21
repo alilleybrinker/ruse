@@ -1,17 +1,12 @@
 use lex::{self, IterExt};
 
 /// Lexes an input string to get a vector of tokens from it.
-pub struct Lexer {}
+pub struct Lexer;
 
 impl Lexer {
-    /// Get a new Lexer.
-    pub fn new() -> Lexer {
-        Lexer {}
-    }
-
     /// Get a vector of tokens from the given string, or a lex::Error if there's
     /// something wrong with the input stream.
-    pub fn lex(&self, s: &str) -> lex::Result {
+    pub fn lex(s: &str) -> lex::Result {
         s.tokens().collect::<lex::Result>()
     }
 }

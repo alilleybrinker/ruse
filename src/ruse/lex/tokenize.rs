@@ -4,14 +4,6 @@ use std::iter::Peekable;
 use std::str::Chars;
 use std::iter::Iterator;
 
-pub trait IterExt: AsRef<str> {
-    fn tokens<'a>(&'a self) -> Tokenize<'a> {
-        Tokenize::new(self.as_ref())
-    }
-}
-
-impl IterExt for str {}
-
 pub struct Tokenize<'a> {
     char_iter: Peekable<Chars<'a>>,
     location: Cell<usize>,
@@ -135,3 +127,11 @@ impl<'a> Iterator for Tokenize<'a> {
         None
     }
 }
+
+pub trait IterExt: AsRef<str> {
+    fn tokens<'a>(&'a self) -> Tokenize<'a> {
+        Tokenize::new(self.as_ref())
+    }
+}
+
+impl IterExt for str {}
