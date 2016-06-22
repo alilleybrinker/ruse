@@ -1,17 +1,12 @@
 //! Generate a syntax tree from an input stream.
 
 use parse;
-use lex::Lexer;
+use lex::Token;
 
 /// Parse an input string, returning a syntax tree that can be evaluated.
-pub struct Parser {}
+pub struct Parser;
 
 impl Parser {
-    /// Get a new Parser.
-    pub fn new() -> Parser {
-        Parser {}
-    }
-
     /// This function takes in a string representing a ruse expression, and
     /// parses it into an abstract syntax tree.
     ///
@@ -35,12 +30,7 @@ impl Parser {
     /// For now, this is done by assuming that the first item after an open
     /// paren is a function call, and that everything after is an atom. This
     /// will obviously become better over time.
-    pub fn parse<S: AsRef<str>>(&mut self, s: S) -> parse::Result {
-        let tokens = try!(Lexer::lex(s.as_ref()));
-        println!("{:?} {:?}", s.as_ref(), tokens);
-
-        // Tokens will be a Vec<Token>, which should then be parsed into a
-        // SyntaxTree.
+    pub fn parse(tokens: &[Token]) -> parse::Result {
         unimplemented!()
     }
 }
