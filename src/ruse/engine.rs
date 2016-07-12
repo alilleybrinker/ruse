@@ -24,6 +24,9 @@ impl Engine {
     /// incorrect number of arguments, and invalid operation (type issues).
     pub fn eval<S: AsRef<str>>(&mut self, s: S) -> Result<String, parse::Error> {
         let tokens = Lexer::lex(s.as_ref()).unwrap();
+
+        println!("{:?}", tokens);
+
         let syntax_tree = Parser::parse(&tokens).unwrap();
 
         Ok(syntax_tree.into())

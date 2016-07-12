@@ -9,3 +9,13 @@ pub use self::error::*;
 pub use self::lex::*;
 pub use self::token::*;
 pub use self::tokenize::*;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn blah() {
+        assert_eq!(4, 4);
+    }
+}

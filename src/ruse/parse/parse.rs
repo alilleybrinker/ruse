@@ -15,22 +15,28 @@ impl Parser {
     ///
     /// For example, the following program:
     ///
-    ///     (+ 2 3)
+    /// ```ruse
+    /// (+ 2 3)
+    /// ```
     ///
     /// Becomes:
     ///
-    ///     [<open_paren>, <ident:+>, <int_literal: 2>, <int_literal: 3>, <close_paren>]
+    /// ```text
+    /// [<open_paren>, <ident:+>, <int_literal: 2>, <int_literal: 3>, <close_paren>]
+    /// ```
     ///
     /// Becomes:
     ///
+    /// ```text
     ///         <fn: '+'>
     ///         /       \
     /// <atom: 2>       <atom: 3>
+    /// ```
     ///
     /// For now, this is done by assuming that the first item after an open
     /// paren is a function call, and that everything after is an atom. This
     /// will obviously become better over time.
-    pub fn parse(tokens: &[Token]) -> parse::Result {
+    pub fn parse(_: &[Token]) -> parse::Result {
         unimplemented!()
     }
 }
