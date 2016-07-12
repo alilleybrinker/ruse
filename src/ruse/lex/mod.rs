@@ -59,7 +59,7 @@ mod tests {
 
     #[test]
     fn lex_a_more_complex_program() {
-        let tokens = Lexer::lex("(+ (add-two 2) 3)").unwrap();
+        let tokens = Lexer::lex("(+ (add-two 2) 3.2)").unwrap();
         let expected = vec![
             Token::open_paren(1),
             Token::ident("+".to_string(), 2),
@@ -67,7 +67,7 @@ mod tests {
             Token::ident("add-two".to_string(), 5),
             Token::integer(2, 1, 7),
             Token::close_paren(8),
-            Token::integer(3, 1, 10),
+            Token::float(3.2, 3, 10),
             Token::close_paren(11),
         ];
     }
