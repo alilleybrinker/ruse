@@ -46,11 +46,29 @@ mod tests {
 
     #[test]
     fn lex_a_simple_program() {
-        assert_eq!(4, 4);
+        let tokens = Lexer::lex("(+ 2 3)").unwrap();
+        let expected = vec![
+            Token::open_paren(1),
+            Token::ident("+".to_string(), 2),
+            Token::integer(2, 1, 4),
+            Token::integer(3, 1, 6),
+            Token::close_paren(7),
+        ];
+        assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_a_more_complex_program() {
-        assert_eq!(4, 4);
+        let tokens = Lexer::lex("(+ (add-two 2) 3)").unwrap();
+        let expected = vec![
+            Token::open_paren(1),
+            Token::ident("+".to_string(), 2),
+            Token::open_paren(4),
+            Token::ident("add-two".to_string(), 5),
+            Token::integer(2, 1, 7),
+            Token::close_paren(8),
+            Token::integer(3, 1, 10),
+            Token::close_paren(11),
+        ];
     }
 }
