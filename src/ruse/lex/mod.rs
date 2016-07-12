@@ -32,12 +32,16 @@ mod tests {
 
     #[test]
     fn lex_a_single_close_paren() {
-        assert_eq!(4, 4);
+        let tokens = Lexer::lex(")").unwrap();
+        let expected = vec![Token::close_paren(1)];
+        assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_matching_parens() {
-        assert_eq!(4, 4);
+        let tokens = Lexer::lex("()").unwrap();
+        let expected = vec![Token::open_paren(1), Token::close_paren(2)];
+        assert_eq!(tokens, expected);
     }
 
     #[test]
