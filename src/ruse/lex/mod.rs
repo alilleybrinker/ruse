@@ -25,7 +25,6 @@ mod tests {
     #[test]
     fn lex_a_single_open_paren() {
         let tokens = Lexer::lex("(").unwrap();
-        // Input stream locations are 1-indexed.
         let expected = vec![Token::open_paren(1)];
         assert_eq!(tokens, expected);
     }
