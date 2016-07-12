@@ -12,16 +12,22 @@ pub use self::tokenize::*;
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
+    use super::lex::Lexer;
+    use super::token::Token;
 
     #[test]
     fn lex_the_empty_program() {
-        assert_eq!(4, 4);
+        let tokens = Lexer::lex("").unwrap();
+        let expected = vec![];
+        assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_a_single_open_paren() {
-        assert_eq!(4, 4);
+        let tokens = Lexer::lex("(").unwrap();
+        // Input stream locations are 1-indexed.
+        let expected = vec![Token::open_paren(1)];
+        assert_eq!(tokens, expected);
     }
 
     #[test]
