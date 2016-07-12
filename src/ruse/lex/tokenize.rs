@@ -43,6 +43,7 @@ impl<'a> Tokenize<'a> {
     fn parse_number(&mut self, character: char) -> Result<Token, lex::Error> {
         let mut len = 1;
         let mut result = Vec::new();
+        let location = self.location.get();
         result.push(character);
 
         while let Some(&next_character) = self.char_iter.peek() {
@@ -66,11 +67,11 @@ impl<'a> Tokenize<'a> {
         let out: String = result.iter().cloned().collect();
 
         if let Ok(val) = out.parse::<i64>() {
-            return Ok(Token::integer(val, len, self.location.get()));
+            return Ok(Token::integer(val, len, location));
         }
 
         if let Ok(val) = out.parse::<f64>() {
-            return Ok(Token::float(val, len, self.location.get()));
+            return Ok(Token::float(val, len, location));
         }
 
         Err(lex::Error::MalformedNumber(out))
@@ -79,6 +80,7 @@ impl<'a> Tokenize<'a> {
     /// Parse an identifier.
     fn parse_identifier(&mut self, character: char) -> Result<Token, lex::Error> {
         let mut result = Vec::new();
+        let location = self.location.get();
         result.push(character);
 
         while let Some(&next_character) = self.char_iter.peek() {
@@ -91,12 +93,12 @@ impl<'a> Tokenize<'a> {
                     self.char_iter.next();
                 }
                 ' ' | '\n' | '\t' | '\r' => break,
-                _ => return Err(lex::Error::InvalidCharacter(next_character, self.location.get())),
+                _ => return Err(lex::Error::InvalidCharacter(next_character, location)),
             }
         }
 
         let out: String = result.iter().cloned().collect();
-        Ok(Token::ident(out, self.location.get()))
+        Ok(Token::ident(out, location))
     }
 }
 

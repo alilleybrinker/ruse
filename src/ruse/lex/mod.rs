@@ -64,10 +64,11 @@ mod tests {
             Token::ident("+".to_string(), 2),
             Token::open_paren(4),
             Token::ident("add-two".to_string(), 5),
-            Token::integer(2, 1, 7),
-            Token::close_paren(8),
-            Token::float(3.2, 3, 10),
-            Token::close_paren(11),
+            Token::integer(2, 1, 13),
+            Token::close_paren(14),
+            Token::float(3.2, 3, 16),
+            Token::close_paren(19),
         ];
+        assert_eq!(tokens, expected);
     }
 }
