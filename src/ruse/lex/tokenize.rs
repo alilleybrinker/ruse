@@ -1,6 +1,6 @@
 //! An iterator for parsing tokens from an input stream.
 
-use lex::{self, Token};
+use lex::{self, Token, Span, Location};
 use std::cell::Cell;
 use std::iter::Peekable;
 use std::str::Chars;
@@ -31,12 +31,12 @@ impl<'a> Tokenize<'a> {
 
     /// Parse an open parenthese.
     fn parse_open_paren(&self) -> Result<Token, lex::Error> {
-        Ok(Token::open_paren(self.location.get()))
+        Ok(Token::open_paren(Location(self.location.get())))
     }
 
     /// Parse a closed parenthese.
     fn parse_close_paren(&self) -> Result<Token, lex::Error> {
-        Ok(Token::close_paren(self.location.get()))
+        Ok(Token::close_paren(Location(self.location.get())))
     }
 
     /// Parse a number, either floating point or integer.
@@ -67,11 +67,11 @@ impl<'a> Tokenize<'a> {
         let out: String = result.iter().cloned().collect();
 
         if let Ok(val) = out.parse::<i64>() {
-            return Ok(Token::integer(val, len, location));
+            return Ok(Token::integer(val, Span(len), Location(location)));
         }
 
         if let Ok(val) = out.parse::<f64>() {
-            return Ok(Token::float(val, len, location));
+            return Ok(Token::float(val, Span(len), Location(location)));
         }
 
         Err(lex::Error::MalformedNumber(out))
@@ -98,7 +98,7 @@ impl<'a> Tokenize<'a> {
         }
 
         let out: String = result.iter().cloned().collect();
-        Ok(Token::ident(out, location))
+        Ok(Token::ident(out, Location(location)))
     }
 }
 
