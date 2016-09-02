@@ -1,6 +1,6 @@
 //! An iterator for parsing tokens from an input stream.
 
-use lex::{self, Token, Span, Location};
+use lex::{self, Token, Span, Location, Error};
 use std::cell::Cell;
 use std::iter::Peekable;
 use std::str::Chars;
@@ -128,7 +128,7 @@ impl<'a> Iterator for Tokenize<'a> {
                     return Some(self.parse_identifier(character))
                 }
                 ' ' | '\n' | '\t' | '\r' => (),
-                _ => unreachable!(),
+                _ => return Some(Err(Error::InvalidCharacter(character, self.location.get()))),
             }
         }
 

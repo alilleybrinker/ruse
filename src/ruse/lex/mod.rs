@@ -14,6 +14,7 @@ pub use self::tokenize::*;
 mod tests {
     use super::lex::Lexer;
     use super::token::{Token, Location, Span};
+    use super::error::Error;
 
     #[test]
     fn lex_the_empty_program() {
@@ -70,5 +71,12 @@ mod tests {
             Token::close_paren(Location(19)),
         ];
         assert_eq!(tokens, expected);
+    }
+
+    #[test]
+    fn lex_a_non_ascii_character() {
+        let result = Lexer::lex("(+ (¢ 3) 4)");
+        let expected = Err(Error::InvalidCharacter('¢', 5));
+        assert_eq!(result, expected);
     }
 }

@@ -11,7 +11,7 @@ pub type Result = result::Result<Vec<Token>, Error>;
 
 /// A lexing error, indicating some problem with the contents of the input
 /// stream.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Error {
     /// Character and location
     InvalidCharacter(char, usize),
