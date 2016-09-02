@@ -1,6 +1,6 @@
 //! An iterator for parsing tokens from an input stream.
 
-use lex::{self, Token, Span, Location, Error};
+use read::lex::{self, Token, Span, Location, Error};
 use std::cell::Cell;
 use std::iter::Peekable;
 use std::str::Chars;

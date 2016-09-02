@@ -1,7 +1,7 @@
 //! Generate a syntax tree from an input stream.
 
-use parse;
-use lex::Token;
+use read::parse;
+use read::lex::Token;
 
 /// Parse an input string, returning a syntax tree that can be evaluated.
 pub struct Parser;

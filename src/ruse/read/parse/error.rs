@@ -1,7 +1,7 @@
 //! Parser error and result types.
 
-use lex;
-use parse::SyntaxTree;
+use read::lex;
+use read::parse::SyntaxTree;
 use std::error;
 use std::fmt;
 use std::result;

@@ -3,8 +3,8 @@
 //! The engine is the main interface between Ruse and Rust. It is where
 //! Rust functions are registered, and where Ruse functions are run.
 
-use lex::Lexer;
-use parse::{self, Parser};
+use read::read;
+use read::parse;
 
 /// Eventually the Engine will store all Rust-side function bindings, and
 /// provide a way for the user to register new bindings. There will also
@@ -24,8 +24,7 @@ impl Engine {
     /// of its own failure variants, most notably failed function lookup,
     /// incorrect number of arguments, and invalid operation (type issues).
     pub fn eval<S: AsRef<str>>(&mut self, s: S) -> Result<String, parse::Error> {
-        let tokens = Lexer::lex(s.as_ref()).unwrap();
-        let syntax_tree = Parser::parse(&tokens).unwrap();
+        let syntax_tree = read(s.as_ref()).unwrap();
         Ok(syntax_tree.into())
     }
 }
