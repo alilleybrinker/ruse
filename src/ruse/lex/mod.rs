@@ -18,49 +18,49 @@ mod tests {
 
     #[test]
     fn lex_the_empty_program() {
-        let tokens = Lexer::lex("").unwrap();
-        let expected = vec![];
+        let tokens = Lexer::lex("");
+        let expected = Ok(vec![]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_a_single_open_paren() {
-        let tokens = Lexer::lex("(").unwrap();
-        let expected = vec![Token::open_paren(Location(1))];
+        let tokens = Lexer::lex("(");
+        let expected = Ok(vec![Token::open_paren(Location(1))]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_a_single_close_paren() {
-        let tokens = Lexer::lex(")").unwrap();
-        let expected = vec![Token::close_paren(Location(1))];
+        let tokens = Lexer::lex(")");
+        let expected = Ok(vec![Token::close_paren(Location(1))]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_matching_parens() {
-        let tokens = Lexer::lex("()").unwrap();
-        let expected = vec![Token::open_paren(Location(1)), Token::close_paren(Location(2))];
+        let tokens = Lexer::lex("()");
+        let expected = Ok(vec![Token::open_paren(Location(1)), Token::close_paren(Location(2))]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_a_simple_program() {
-        let tokens = Lexer::lex("(+ 2 3)").unwrap();
-        let expected = vec![
+        let tokens = Lexer::lex("(+ 2 3)");
+        let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::ident("+".to_string(), Location(2)),
             Token::integer(2, Span(1), Location(4)),
             Token::integer(3, Span(1), Location(6)),
             Token::close_paren(Location(7)),
-        ];
+        ]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_a_more_complex_program() {
-        let tokens = Lexer::lex("(+ (add-two 2) 3.2)").unwrap();
-        let expected = vec![
+        let tokens = Lexer::lex("(+ (add-two 2) 3.2)");
+        let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::ident("+".to_string(), Location(2)),
             Token::open_paren(Location(4)),
@@ -69,7 +69,7 @@ mod tests {
             Token::close_paren(Location(14)),
             Token::float(3.2, Span(3), Location(16)),
             Token::close_paren(Location(19)),
-        ];
+        ]);
         assert_eq!(tokens, expected);
     }
 
