@@ -1,6 +1,7 @@
-//! Stores function bindings and provides a way for the user to register new
-//! bindings, on either the Ruse or Rust side. This is also the entry point
-//! to running Ruse programs.
+//! The entry point for running Ruse programs.
+//!
+//! The engine is the main interface between Ruse and Rust. It is where
+//! Rust functions are registered, and where Ruse functions are run.
 
 use lex::Lexer;
 use parse::{self, Parser};

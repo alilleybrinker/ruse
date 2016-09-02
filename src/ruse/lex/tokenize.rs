@@ -40,11 +40,15 @@ impl<'a> Tokenize<'a> {
     }
 
     /// Parse a number, either floating point or integer.
+    ///
+    /// Attempts to parse a number. For now, it parses only integers and
+    /// floating point numbers. Eventually we'll want to cover the entire
+    /// numeric tower that Scheme requires, which will demand substantially
+    /// more work than is being done now.
     fn parse_number(&mut self, character: char) -> Result<Token, lex::Error> {
         let mut len = 1;
-        let mut result = Vec::new();
+        let mut result = vec![character];
         let location = self.location.get();
-        result.push(character);
 
         while let Some(&next_character) = self.char_iter.peek() {
             match next_character {
@@ -78,10 +82,16 @@ impl<'a> Tokenize<'a> {
     }
 
     /// Parse an identifier.
+    ///
+    /// This parses an identifier, starting with the given character, which is
+    /// passed in for convenience. Note that at the moment the character
+    /// matching rules are kept in sync manually between this function and the
+    /// original dispatcher, and that they are not exactly the same. There are
+    /// certain characters which are acceptible within an identifier that are
+    /// not acceptable at the start of one.
     fn parse_identifier(&mut self, character: char) -> Result<Token, lex::Error> {
-        let mut result = Vec::new();
+        let mut result = vec![character];
         let location = self.location.get();
-        result.push(character);
 
         while let Some(&next_character) = self.char_iter.peek() {
             match next_character {
@@ -92,6 +102,7 @@ impl<'a> Tokenize<'a> {
                     result.push(next_character);
                     self.char_iter.next();
                 }
+                // Stop on whitespace.
                 ' ' | '\n' | '\t' | '\r' => break,
                 _ => return Err(Error::InvalidCharacter(next_character, location)),
             }
@@ -127,6 +138,7 @@ impl<'a> Iterator for Tokenize<'a> {
                 '>' | '?' | '^' | '_' | '~' | '+' | '-' => {
                     return Some(self.parse_identifier(character))
                 }
+                // Skip whitespace.
                 ' ' | '\n' | '\t' | '\r' => (),
                 _ => return Some(Err(Error::InvalidCharacter(character, self.location.get()))),
             }
