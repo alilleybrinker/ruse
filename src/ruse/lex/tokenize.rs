@@ -74,7 +74,7 @@ impl<'a> Tokenize<'a> {
             return Ok(Token::float(val, Span(len), Location(location)));
         }
 
-        Err(lex::Error::MalformedNumber(out))
+        Err(Error::MalformedNumber(out))
     }
 
     /// Parse an identifier.
@@ -93,7 +93,7 @@ impl<'a> Tokenize<'a> {
                     self.char_iter.next();
                 }
                 ' ' | '\n' | '\t' | '\r' => break,
-                _ => return Err(lex::Error::InvalidCharacter(next_character, location)),
+                _ => return Err(Error::InvalidCharacter(next_character, location)),
             }
         }
 
