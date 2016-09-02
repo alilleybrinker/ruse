@@ -74,7 +74,7 @@ mod tests {
     }
 
     #[test]
-    fn lex_a_non_ascii_character() {
+    fn fail_to_lex_a_non_ascii_character() {
         let result = Lexer::lex("(+ (¢ 3) 4)");
         let expected = Err(Error::InvalidCharacter('¢', 5));
         assert_eq!(result, expected);
