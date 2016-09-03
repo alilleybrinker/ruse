@@ -49,7 +49,7 @@ mod tests {
         let tokens = Lexer::lex("(+ 2 3)");
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
-            Token::ident("+".to_string(), Location(2)),
+            Token::ident("+", Location(2)),
             Token::integer(2, Span(1), Location(4)),
             Token::integer(3, Span(1), Location(6)),
             Token::close_paren(Location(7)),
@@ -62,9 +62,9 @@ mod tests {
         let tokens = Lexer::lex("(+ (add-two 2) 3.2)");
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
-            Token::ident("+".to_string(), Location(2)),
+            Token::ident("+", Location(2)),
             Token::open_paren(Location(4)),
-            Token::ident("add-two".to_string(), Location(5)),
+            Token::ident("add-two", Location(5)),
             Token::integer(2, Span(1), Location(13)),
             Token::close_paren(Location(14)),
             Token::float(3.2, Span(3), Location(16)),
