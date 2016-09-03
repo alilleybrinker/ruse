@@ -1,5 +1,5 @@
 extern crate ruse;
-use ruse::engine::Engine;
+use ruse::Engine;
 
 fn main() {
     let mut engine = Engine::new();
