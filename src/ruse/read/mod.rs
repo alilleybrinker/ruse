@@ -3,7 +3,6 @@
 pub mod error;
 pub mod lex;
 pub mod parse;
-pub mod util;
 
 use read;
 use read::lex::Lexer;
