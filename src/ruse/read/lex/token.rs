@@ -57,8 +57,8 @@ impl Token {
     }
 
     /// Token constructor for identifiers.
-    pub fn ident<S: ToString>(name: S, location: Location) -> Token {
-        let name = name.to_string();
+    pub fn ident<S: Into<String>>(name: S, location: Location) -> Token {
+        let name: String = name.into();
         let len = name.len();
         Token {
             kind: TokenKind::Ident(name),
