@@ -12,5 +12,6 @@ use read::parse::Parser;
 /// of that program.
 pub fn read<S: AsRef<str>>(s: S) -> read::error::Result {
     let tokens = try!(Lexer::lex(s));
-    Ok(try!(Parser::parse(&tokens)))
+    let syntax_tree = try!(Parser::parse(&tokens));
+    Ok(syntax_tree)
 }
