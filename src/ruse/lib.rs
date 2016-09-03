@@ -1,5 +1,4 @@
 #![deny(missing_docs)]
-#![feature(question_mark)]
 
 //! Ruse is an embedded Scheme for Rust. It is currently in the very early
 //! stages, and should not be used for anything.
