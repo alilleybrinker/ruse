@@ -23,8 +23,8 @@ impl Engine {
     /// EvalError would probably be a wrapper around ParseError, along with some
     /// of its own failure variants, most notably failed function lookup,
     /// incorrect number of arguments, and invalid operation (type issues).
-    pub fn eval<S: AsRef<str>>(&mut self, s: S) -> Result<String, parse::Error> {
-        let syntax_tree = read(s.as_ref()).unwrap();
+    pub fn run<S: AsRef<str>>(&mut self, s: S) -> Result<String, parse::Error> {
+        let syntax_tree = read(s).unwrap();
         Ok(syntax_tree.into())
     }
 }
