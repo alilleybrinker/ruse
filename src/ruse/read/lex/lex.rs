@@ -1,6 +1,6 @@
 //! Generate a vector of tokens from an input stream.
 
-use read::lex::{self, StrIterExt};
+use read::lex::{self, StrTokenIterator};
 
 /// Lexes an input string to get a vector of tokens from it.
 pub struct Lexer;

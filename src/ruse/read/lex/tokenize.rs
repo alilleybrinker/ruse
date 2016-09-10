@@ -7,7 +7,7 @@ use std::str::Chars;
 use std::iter::Iterator;
 
 /// An iterator over the tokens in an input string.
-pub struct Tokenize<'a> {
+pub struct TokenIterator<'a> {
     /// A peekable iterator over the characters in the original string.
     char_iter: Peekable<Chars<'a>>,
     /// The location of the iterator in the input stream.
@@ -20,10 +20,10 @@ enum Iterate {
     No,
 }
 
-impl<'a> Tokenize<'a> {
-    /// Create a new Tokenize to iterate over the given string.
-    pub fn new<'b>(s: &'b str) -> Tokenize<'b> {
-        Tokenize {
+impl<'a> TokenIterator<'a> {
+    /// Create a new TokenIterator to iterate over the given string.
+    pub fn new<'b>(s: &'b str) -> TokenIterator<'b> {
+        TokenIterator {
             char_iter: s.chars().peekable(),
             location: Cell::new(Location(0)),
         }
@@ -119,7 +119,7 @@ impl<'a> Tokenize<'a> {
     }
 }
 
-impl<'a> Iterator for Tokenize<'a> {
+impl<'a> Iterator for TokenIterator<'a> {
     /// Returns either a Token or a lexing error.
     type Item = Result<Token, lex::Error>;
 
@@ -155,12 +155,12 @@ impl<'a> Iterator for Tokenize<'a> {
 }
 
 /// Extend a stringy type with the ability to generate tokens.
-pub trait StrIterExt: AsRef<str> {
+pub trait StrTokenIterator: AsRef<str> {
     /// Convenience method to get a token iterator for a string.
-    fn tokens<'a>(&'a self) -> Tokenize<'a> {
-        Tokenize::new(self.as_ref())
+    fn tokens<'a>(&'a self) -> TokenIterator<'a> {
+        TokenIterator::new(self.as_ref())
     }
 }
 
 // Implement StrIterExt for all types that can be ref'ed into string slices.
-impl<T: AsRef<str>> StrIterExt for T {}
+impl<T: AsRef<str>> StrTokenIterator for T {}
