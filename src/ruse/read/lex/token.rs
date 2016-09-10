@@ -68,6 +68,7 @@ impl Token {
     pub fn ident<S: Into<String>>(name: S, location: Location) -> Token {
         let name: String = name.into();
         let len = name.len();
+
         Token {
             kind: TokenKind::Ident(name),
             location: location,
