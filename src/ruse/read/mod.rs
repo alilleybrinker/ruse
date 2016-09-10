@@ -4,14 +4,12 @@ pub mod error;
 pub mod lex;
 pub mod parse;
 
-use read;
-use read::lex::Lexer;
-use read::parse::Parser;
+use read::error::Result;
+use read::lex::Lex;
+use read::parse::Parse;
 
 /// Read a string representing a Ruse program into a syntax tree representation
 /// of that program.
-pub fn read<S: AsRef<str>>(s: S) -> read::error::Result {
-    let tokens = try!(Lexer::lex(s));
-    let syntax_tree = try!(Parser::parse(&tokens));
-    Ok(syntax_tree)
+pub fn read<S: AsRef<str>>(s: S) -> Result {
+    Ok(s.lex()?.parse()?)
 }

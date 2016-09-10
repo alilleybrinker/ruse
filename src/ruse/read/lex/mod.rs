@@ -1,52 +1,61 @@
 //! Get a vector of tokens from an input string.
 
 pub mod error;
-pub mod lex;
 pub mod token;
 pub mod tokenize;
 
 pub use self::error::*;
-pub use self::lex::*;
 pub use self::token::*;
 pub use self::tokenize::*;
 
+/// Lexes an input string to get a vector of tokens from it.
+pub trait Lex: AsRef<str> {
+    /// Get a vector of tokens from the given string, or a lex::Error if there's
+    /// something wrong with the input stream.
+    fn lex(&self) -> Result {
+        self.as_ref().tokens().collect::<Result>()
+    }
+}
+
+impl<T: AsRef<str>> Lex for T {}
+
 #[cfg(test)]
 mod tests {
-    use super::lex::Lexer;
+    use super::Lex;
     use super::token::{Token, Location};
     use super::error::Error;
 
     #[test]
     fn lex_the_empty_program() {
-        let tokens = Lexer::lex("");
+        let tokens = "".lex();
         let expected = Ok(vec![]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_a_single_open_paren() {
-        let tokens = Lexer::lex("(");
+        let tokens = "(".lex();
         let expected = Ok(vec![Token::open_paren(Location(1))]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_a_single_close_paren() {
-        let tokens = Lexer::lex(")");
+        let tokens = ")".lex();
         let expected = Ok(vec![Token::close_paren(Location(1))]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_matching_parens() {
-        let tokens = Lexer::lex("()");
+        let tokens = "()".lex();
         let expected = Ok(vec![Token::open_paren(Location(1)), Token::close_paren(Location(2))]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_a_simple_program() {
-        let tokens = Lexer::lex("(+ 2 3)");
+        let tokens = "(+ 2 3)".lex();
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::ident("+", Location(2)),
@@ -59,7 +68,7 @@ mod tests {
 
     #[test]
     fn lex_a_more_complex_program() {
-        let tokens = Lexer::lex("(+ (add-two 2) 3.2)");
+        let tokens = "(+ (add-two 2) 3.2)".lex();
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::ident("+", Location(2)),
@@ -75,7 +84,7 @@ mod tests {
 
     #[test]
     fn fail_to_lex_a_non_ascii_character() {
-        let result = Lexer::lex("(+ (¢ 3) 4)");
+        let result = "(+ (¢ 3) 4)".lex();
         let expected = Err(Error::InvalidCharacter('¢', 5));
         assert_eq!(result, expected);
     }
