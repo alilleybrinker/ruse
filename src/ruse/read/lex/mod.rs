@@ -2,11 +2,11 @@
 
 pub mod error;
 pub mod token;
-pub mod tokenize;
+pub mod token_iterator;
 
 pub use self::error::*;
 pub use self::token::*;
-pub use self::tokenize::*;
+pub use self::token_iterator::*;
 
 /// Lexes an input string to get a vector of tokens from it.
 pub trait Lex: AsRef<str> {
