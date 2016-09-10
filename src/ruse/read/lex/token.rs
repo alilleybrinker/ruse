@@ -17,8 +17,16 @@ pub enum TokenKind {
 }
 
 /// The location of a token in an input stream.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Location(pub usize);
+
+impl Location {
+    /// Get the length of the span from the current location to the end
+    /// location.
+    pub fn span_to(&self, end_loc: Location) -> Span {
+        Span(end_loc.0 - self.0 + 1)
+    }
+}
 
 /// The span of a token in an input stream.
 #[derive(Debug, PartialEq)]
@@ -68,20 +76,20 @@ impl Token {
     }
 
     /// Token constructor for integers.
-    pub fn integer(value: i64, span: Span, location: Location) -> Token {
+    pub fn integer(value: i64, start_loc: Location, end_loc: Location) -> Token {
         Token {
             kind: TokenKind::IntegerLiteral(value),
-            location: location,
-            span: span,
+            location: start_loc,
+            span: start_loc.span_to(end_loc),
         }
     }
 
     /// Token constructor for floats.
-    pub fn float(value: f64, span: Span, location: Location) -> Token {
+    pub fn float(value: f64, start_loc: Location, end_loc: Location) -> Token {
         Token {
             kind: TokenKind::FloatLiteral(value),
-            location: location,
-            span: span,
+            location: start_loc,
+            span: start_loc.span_to(end_loc),
         }
     }
 }

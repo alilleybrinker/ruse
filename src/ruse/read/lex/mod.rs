@@ -13,7 +13,7 @@ pub use self::tokenize::*;
 #[cfg(test)]
 mod tests {
     use super::lex::Lexer;
-    use super::token::{Token, Location, Span};
+    use super::token::{Token, Location};
     use super::error::Error;
 
     #[test]
@@ -50,8 +50,8 @@ mod tests {
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::ident("+", Location(2)),
-            Token::integer(2, Span(1), Location(4)),
-            Token::integer(3, Span(1), Location(6)),
+            Token::integer(2, Location(4), Location(4)),
+            Token::integer(3, Location(6), Location(6)),
             Token::close_paren(Location(7)),
         ]);
         assert_eq!(tokens, expected);
@@ -65,9 +65,9 @@ mod tests {
             Token::ident("+", Location(2)),
             Token::open_paren(Location(4)),
             Token::ident("add-two", Location(5)),
-            Token::integer(2, Span(1), Location(13)),
+            Token::integer(2, Location(13), Location(13)),
             Token::close_paren(Location(14)),
-            Token::float(3.2, Span(3), Location(16)),
+            Token::float(3.2, Location(16), Location(18)),
             Token::close_paren(Location(19)),
         ]);
         assert_eq!(tokens, expected);

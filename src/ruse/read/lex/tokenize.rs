@@ -1,6 +1,6 @@
 //! An iterator for parsing tokens from an input stream.
 
-use read::lex::{self, Token, Span, Location, Error};
+use read::lex::{self, Token, Location, Error};
 use std::cell::Cell;
 use std::iter::Peekable;
 use std::str::Chars;
@@ -46,7 +46,6 @@ impl<'a> Tokenize<'a> {
     /// numeric tower that Scheme requires, which will demand substantially
     /// more work than is being done now.
     fn parse_number(&mut self, character: char) -> Result<Token, lex::Error> {
-        let mut len = 1;
         let mut result = vec![character];
         let location = self.location.get();
 
@@ -54,13 +53,11 @@ impl<'a> Tokenize<'a> {
             match next_character {
                 '0'...'9' => {
                     self.increment_location();
-                    len += 1;
                     result.push(next_character);
                     self.char_iter.next();
                 }
                 '.' => {
                     self.increment_location();
-                    len += 1;
                     result.push(next_character);
                     self.char_iter.next();
                 }
@@ -70,12 +67,15 @@ impl<'a> Tokenize<'a> {
 
         let out: String = result.iter().cloned().collect();
 
+        let start_loc = Location(location);
+        let end_loc = Location(self.location.get());
+
         if let Ok(val) = out.parse::<i64>() {
-            return Ok(Token::integer(val, Span(len), Location(location)));
+            return Ok(Token::integer(val, start_loc, end_loc));
         }
 
         if let Ok(val) = out.parse::<f64>() {
-            return Ok(Token::float(val, Span(len), Location(location)));
+            return Ok(Token::float(val, start_loc, end_loc));
         }
 
         Err(Error::MalformedNumber(out))
