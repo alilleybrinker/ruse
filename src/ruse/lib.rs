@@ -16,7 +16,7 @@
 pub mod read;
 
 use read::read;
-use read::parse;
+use read::parse::error::Error;
 use std::path::Path;
 use std::fs::File;
 use std::io::Read;
@@ -39,7 +39,7 @@ impl Engine {
     }
 
     /// Run the engine on a specific program.
-    pub fn run<S: AsRef<str>>(&mut self, s: S) -> Result<String, parse::Error> {
+    pub fn run<S: AsRef<str>>(&mut self, s: S) -> Result<String, Error> {
         let syntax_tree = read(s).unwrap();
         Ok(syntax_tree.into())
     }
@@ -47,7 +47,7 @@ impl Engine {
     /// Run the engine on a program from a file.
     ///
     /// TODO: Remove the unwrapping from this function.
-    pub fn run_file<S: AsRef<Path>>(&mut self, s: S) -> Result<String, parse::Error> {
+    pub fn run_file<S: AsRef<Path>>(&mut self, s: S) -> Result<String, Error> {
         let mut f = File::open(s).unwrap();
         let mut buffer = String::new();
         f.read_to_string(&mut buffer).unwrap();

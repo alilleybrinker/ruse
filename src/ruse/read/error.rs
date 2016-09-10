@@ -6,7 +6,7 @@ use std::fmt;
 use std::result;
 
 /// The result of reading a string.
-pub type Result = result::Result<parse::SyntaxTree, Error>;
+pub type Result = result::Result<parse::syntax_tree::SyntaxTree, Error>;
 
 /// Indicates an error in lexing or parsing.
 #[derive(Debug, PartialEq)]

@@ -1,6 +1,6 @@
 //! Lexing error and result types.
 
-use read::lex::Token;
+use read::lex::token::Token;
 use std::error;
 use std::fmt;
 use std::result;

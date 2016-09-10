@@ -1,6 +1,8 @@
 //! An iterator for parsing tokens from an input stream.
 
-use read::lex::{self, Token, Location, Error};
+use read::lex::error::Error;
+use read::lex::token::{Token, Location};
+
 use std::cell::Cell;
 use std::iter::Peekable;
 use std::str::Chars;
@@ -44,12 +46,12 @@ impl<'a> TokenIterator<'a> {
     }
 
     /// Parse an open parenthese.
-    fn parse_open_paren(&self) -> Result<Token, lex::Error> {
+    fn parse_open_paren(&self) -> Result<Token, Error> {
         Ok(Token::open_paren(self.is_at()))
     }
 
     /// Parse a closed parenthese.
-    fn parse_close_paren(&self) -> Result<Token, lex::Error> {
+    fn parse_close_paren(&self) -> Result<Token, Error> {
         Ok(Token::close_paren(self.is_at()))
     }
 
@@ -59,7 +61,7 @@ impl<'a> TokenIterator<'a> {
     /// floating point numbers. Eventually we'll want to cover the entire
     /// numeric tower that Scheme requires, which will demand substantially
     /// more work than is being done now.
-    fn parse_number(&mut self, character: char) -> Result<Token, lex::Error> {
+    fn parse_number(&mut self, character: char) -> Result<Token, Error> {
         let mut result = vec![character];
         let start = self.is_at();
 
@@ -97,7 +99,7 @@ impl<'a> TokenIterator<'a> {
     /// original dispatcher, and that they are not exactly the same. There are
     /// certain characters which are acceptible within an identifier that are
     /// not acceptable at the start of one.
-    fn parse_identifier(&mut self, character: char) -> Result<Token, lex::Error> {
+    fn parse_identifier(&mut self, character: char) -> Result<Token, Error> {
         let mut result = vec![character];
         let start = self.is_at();
 
@@ -121,12 +123,12 @@ impl<'a> TokenIterator<'a> {
 
 impl<'a> Iterator for TokenIterator<'a> {
     /// Returns either a Token or a lexing error.
-    type Item = Result<Token, lex::Error>;
+    type Item = Result<Token, Error>;
 
     /// Returns one of three things:
     ///
     /// 1. `Option::None`
-    /// 2. `Option::Some(Result::Err(lex::Error))`
+    /// 2. `Option::Some(Result::Err(Error))`
     /// 3. `Option::Some(Result::Ok(Token))`
     ///
     /// Option (1) indicates that there's nothing left to parse. Option (2)

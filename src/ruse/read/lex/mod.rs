@@ -4,9 +4,8 @@ pub mod error;
 pub mod token;
 pub mod token_iterator;
 
-pub use self::error::*;
-pub use self::token::*;
-pub use self::token_iterator::*;
+use read::lex::error::Result;
+use read::lex::token_iterator::StrTokenIterator;
 
 /// Lexes an input string to get a vector of tokens from it.
 pub trait Lex: AsRef<str> {

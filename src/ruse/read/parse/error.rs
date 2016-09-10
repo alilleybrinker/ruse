@@ -1,6 +1,6 @@
 //! Parser error and result types.
 
-use read::parse::SyntaxTree;
+use read::parse::syntax_tree::SyntaxTree;
 use std::error;
 use std::fmt;
 use std::result;

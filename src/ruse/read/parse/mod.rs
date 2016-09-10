@@ -4,12 +4,8 @@ pub mod error;
 pub mod stack;
 pub mod syntax_tree;
 
-pub use self::error::*;
-pub use self::stack::*;
-pub use self::syntax_tree::*;
-
-use read::parse;
-use read::lex::Token;
+use read::lex::token::Token;
+use read::parse::error::Result;
 
 /// Parse an input string, returning a syntax tree that can be evaluated.
 pub trait Parse {
@@ -44,7 +40,7 @@ pub trait Parse {
     /// For now, this is done by assuming that the first item after an open
     /// paren is a function call, and that everything after is an atom. This
     /// will obviously become better over time.
-    fn parse(&self) -> parse::Result {
+    fn parse(&self) -> Result {
         unimplemented!()
     }
 }
