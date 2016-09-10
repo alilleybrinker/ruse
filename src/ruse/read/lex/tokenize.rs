@@ -149,11 +149,11 @@ impl<'a> Iterator for Tokenize<'a> {
 }
 
 /// Extend a stringy type with the ability to generate tokens.
-pub trait IterExt: AsRef<str> {
+pub trait StrIterExt: AsRef<str> {
     /// Convenience method to get a token iterator for a string.
     fn tokens<'a>(&'a self) -> Tokenize<'a> {
         Tokenize::new(self.as_ref())
     }
 }
 
-impl IterExt for str {}
+impl StrIterExt for str {}

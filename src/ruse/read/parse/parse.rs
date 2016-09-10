@@ -33,6 +33,8 @@ impl Parser {
     /// <atom: 2>       <atom: 3>
     /// ```
     ///
+    /// The representation is done via a stack.
+    ///
     /// For now, this is done by assuming that the first item after an open
     /// paren is a function call, and that everything after is an atom. This
     /// will obviously become better over time.
