@@ -14,6 +14,12 @@ pub struct Tokenize<'a> {
     location: Cell<usize>,
 }
 
+/// Indicates whether to move the internal character iterator.
+enum Iterate {
+    Yes,
+    No,
+}
+
 impl<'a> Tokenize<'a> {
     /// Create a new Tokenize to iterate over the given string.
     pub fn new<'b>(s: &'b str) -> Tokenize<'b> {
@@ -24,9 +30,12 @@ impl<'a> Tokenize<'a> {
     }
 
     /// Increment the iterator's internal location field.
-    fn increment_location(&self) {
-        let loc = self.is_at();
-        self.location.set(loc + 1);
+    fn next_loc(&mut self, go_to_next: Iterate) {
+        self.location.set(self.is_at() + 1);
+
+        if let Iterate::Yes = go_to_next {
+            self.char_iter.next();
+        }
     }
 
     /// Get the current location of the parser in the input text.
@@ -57,14 +66,12 @@ impl<'a> Tokenize<'a> {
         while let Some(&next_character) = self.char_iter.peek() {
             match next_character {
                 '0'...'9' => {
-                    self.increment_location();
+                    self.next_loc(Iterate::Yes);
                     result.push(next_character);
-                    self.char_iter.next();
                 }
                 '.' => {
-                    self.increment_location();
+                    self.next_loc(Iterate::Yes);
                     result.push(next_character);
-                    self.char_iter.next();
                 }
                 _ => break,
             }
@@ -72,18 +79,16 @@ impl<'a> Tokenize<'a> {
 
         let out: String = result.iter().cloned().collect();
 
-        let start_loc = Location(location);
-        let end_loc = Location(self.is_at());
+        let start = Location(location);
+        let end = Location(self.is_at());
 
         if let Ok(val) = out.parse::<i64>() {
-            return Ok(Token::integer(val, start_loc, end_loc));
+            Ok(Token::integer(val, start, end))
+        } else if let Ok(val) = out.parse::<f64>() {
+            Ok(Token::float(val, start, end))
+        } else {
+            Err(Error::MalformedNumber(out))
         }
-
-        if let Ok(val) = out.parse::<f64>() {
-            return Ok(Token::float(val, start_loc, end_loc));
-        }
-
-        Err(Error::MalformedNumber(out))
     }
 
     /// Parse an identifier.
@@ -102,10 +107,8 @@ impl<'a> Tokenize<'a> {
             match next_character {
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
                 '>' | '?' | '^' | '_' | '~' | '0'...'9' | '+' | '-' | '.' | '@' => {
-                    self.increment_location();
-
+                    self.next_loc(Iterate::Yes);
                     result.push(next_character);
-                    self.char_iter.next();
                 }
                 // Stop on whitespace.
                 ' ' | '\n' | '\t' | '\r' => break,
@@ -133,7 +136,7 @@ impl<'a> Iterator for Tokenize<'a> {
     /// tokens are returned to the user.
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(character) = self.char_iter.next() {
-            self.increment_location();
+            self.next_loc(Iterate::No);
 
             match character {
                 '(' => return Some(self.parse_open_paren()),
