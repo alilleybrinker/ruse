@@ -9,3 +9,5 @@ rust:
 matrix:
   allow_failures:
     - rust: nightly
+sudo: false
+cache: cargo
