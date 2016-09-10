@@ -25,18 +25,23 @@ impl<'a> Tokenize<'a> {
 
     /// Increment the iterator's internal location field.
     fn increment_location(&self) {
-        let old_location = self.location.get();
-        self.location.set(old_location + 1);
+        let loc = self.is_at();
+        self.location.set(loc + 1);
+    }
+
+    /// Get the current location of the parser in the input text.
+    fn is_at(&self) -> usize {
+        self.location.get()
     }
 
     /// Parse an open parenthese.
     fn parse_open_paren(&self) -> Result<Token, lex::Error> {
-        Ok(Token::open_paren(Location(self.location.get())))
+        Ok(Token::open_paren(Location(self.is_at())))
     }
 
     /// Parse a closed parenthese.
     fn parse_close_paren(&self) -> Result<Token, lex::Error> {
-        Ok(Token::close_paren(Location(self.location.get())))
+        Ok(Token::close_paren(Location(self.is_at())))
     }
 
     /// Parse a number, either floating point or integer.
@@ -47,7 +52,7 @@ impl<'a> Tokenize<'a> {
     /// more work than is being done now.
     fn parse_number(&mut self, character: char) -> Result<Token, lex::Error> {
         let mut result = vec![character];
-        let location = self.location.get();
+        let location = self.is_at();
 
         while let Some(&next_character) = self.char_iter.peek() {
             match next_character {
@@ -68,7 +73,7 @@ impl<'a> Tokenize<'a> {
         let out: String = result.iter().cloned().collect();
 
         let start_loc = Location(location);
-        let end_loc = Location(self.location.get());
+        let end_loc = Location(self.is_at());
 
         if let Ok(val) = out.parse::<i64>() {
             return Ok(Token::integer(val, start_loc, end_loc));
@@ -91,7 +96,7 @@ impl<'a> Tokenize<'a> {
     /// not acceptable at the start of one.
     fn parse_identifier(&mut self, character: char) -> Result<Token, lex::Error> {
         let mut result = vec![character];
-        let location = self.location.get();
+        let location = self.is_at();
 
         while let Some(&next_character) = self.char_iter.peek() {
             match next_character {
@@ -140,7 +145,7 @@ impl<'a> Iterator for Tokenize<'a> {
                 }
                 // Skip whitespace.
                 ' ' | '\n' | '\t' | '\r' => (),
-                _ => return Some(Err(Error::InvalidCharacter(character, self.location.get()))),
+                _ => return Some(Err(Error::InvalidCharacter(character, self.is_at()))),
             }
         }
 
