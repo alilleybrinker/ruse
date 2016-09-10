@@ -162,4 +162,5 @@ pub trait StrIterExt: AsRef<str> {
     }
 }
 
-impl StrIterExt for str {}
+// Implement StrIterExt for all types that can be ref'ed into string slices.
+impl<T: AsRef<str>> StrIterExt for T {}
