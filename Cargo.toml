@@ -7,7 +7,7 @@ homepage    = "https://github.com/ruse-lang/ruse"
 repository  = "https://github.com/ruse-lang/ruse"
 readme      = "README.md"
 keywords    = ["language", "lisp"]
-license     = "Apache 2.0 / MIT"
+license     = "MIT/Apache-2.0"
 
 [lib]
 name = "ruse"
