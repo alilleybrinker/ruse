@@ -11,7 +11,7 @@ pub struct Tokenize<'a> {
     /// A peekable iterator over the characters in the original string.
     char_iter: Peekable<Chars<'a>>,
     /// The location of the iterator in the input stream.
-    location: Cell<usize>,
+    location: Cell<Location>,
 }
 
 /// Indicates whether to move the internal character iterator.
@@ -25,13 +25,13 @@ impl<'a> Tokenize<'a> {
     pub fn new<'b>(s: &'b str) -> Tokenize<'b> {
         Tokenize {
             char_iter: s.chars().peekable(),
-            location: Cell::new(0),
+            location: Cell::new(Location(0)),
         }
     }
 
     /// Increment the iterator's internal location field.
     fn next_loc(&mut self, go_to_next: Iterate) {
-        self.location.set(self.is_at() + 1);
+        self.location.set(Location(self.is_at().0 + 1));
 
         if let Iterate::Yes = go_to_next {
             self.char_iter.next();
@@ -39,18 +39,18 @@ impl<'a> Tokenize<'a> {
     }
 
     /// Get the current location of the parser in the input text.
-    fn is_at(&self) -> usize {
+    fn is_at(&self) -> Location {
         self.location.get()
     }
 
     /// Parse an open parenthese.
     fn parse_open_paren(&self) -> Result<Token, lex::Error> {
-        Ok(Token::open_paren(Location(self.is_at())))
+        Ok(Token::open_paren(self.is_at()))
     }
 
     /// Parse a closed parenthese.
     fn parse_close_paren(&self) -> Result<Token, lex::Error> {
-        Ok(Token::close_paren(Location(self.is_at())))
+        Ok(Token::close_paren(self.is_at()))
     }
 
     /// Parse a number, either floating point or integer.
@@ -61,7 +61,7 @@ impl<'a> Tokenize<'a> {
     /// more work than is being done now.
     fn parse_number(&mut self, character: char) -> Result<Token, lex::Error> {
         let mut result = vec![character];
-        let location = self.is_at();
+        let start = self.is_at();
 
         while let Some(&next_character) = self.char_iter.peek() {
             match next_character {
@@ -78,9 +78,7 @@ impl<'a> Tokenize<'a> {
         }
 
         let out: String = result.iter().cloned().collect();
-
-        let start = Location(location);
-        let end = Location(self.is_at());
+        let end = self.is_at();
 
         if let Ok(val) = out.parse::<i64>() {
             Ok(Token::integer(val, start, end))
@@ -101,7 +99,7 @@ impl<'a> Tokenize<'a> {
     /// not acceptable at the start of one.
     fn parse_identifier(&mut self, character: char) -> Result<Token, lex::Error> {
         let mut result = vec![character];
-        let location = self.is_at();
+        let start = self.is_at();
 
         while let Some(&next_character) = self.char_iter.peek() {
             match next_character {
@@ -112,12 +110,12 @@ impl<'a> Tokenize<'a> {
                 }
                 // Stop on whitespace.
                 ' ' | '\n' | '\t' | '\r' => break,
-                _ => return Err(Error::InvalidCharacter(next_character, location)),
+                _ => return Err(Error::InvalidCharacter(next_character, start.0)),
             }
         }
 
         let out: String = result.iter().cloned().collect();
-        Ok(Token::ident(out, Location(location)))
+        Ok(Token::ident(out, start))
     }
 }
 
@@ -148,7 +146,7 @@ impl<'a> Iterator for Tokenize<'a> {
                 }
                 // Skip whitespace.
                 ' ' | '\n' | '\t' | '\r' => (),
-                _ => return Some(Err(Error::InvalidCharacter(character, self.is_at()))),
+                _ => return Some(Err(Error::InvalidCharacter(character, self.is_at().0))),
             }
         }
 
