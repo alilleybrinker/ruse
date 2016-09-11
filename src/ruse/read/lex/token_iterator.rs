@@ -63,6 +63,9 @@ impl<'a> Iterator for TokenIterator<'a> {
         while let Some(character) = self.char_iter.next() {
             self.next_location(IterateInternally::No);
 
+            // Decide what to attempt to lex based on the first character. Note that the
+            // allowable characters for identifiers are fewer here then they are in the
+            // lex_identifier function.
             match character {
                 '(' => return Some(lex_open_paren(&self)),
                 ')' => return Some(lex_close_paren(&self)),

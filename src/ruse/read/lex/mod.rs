@@ -82,6 +82,19 @@ mod tests {
     }
 
     #[test]
+    fn lex_a_complex_identifier() {
+        let tokens = "(%a+/d 2 4)".lex();
+        let expected = Ok(vec![
+            Token::open_paren(Location(1)),
+            Token::ident("%a+/d", Location(2)),
+            Token::integer(2, Location(8), Location(8)),
+            Token::integer(4, Location(10), Location(10)),
+            Token::close_paren(Location(11)),
+        ]);
+        assert_eq!(tokens, expected);
+    }
+
+    #[test]
     fn fail_to_lex_a_non_ascii_character() {
         let result = "(+ (¢ 3) 4)".lex();
         let expected = Err(Error::InvalidCharacter('¢', 5));
