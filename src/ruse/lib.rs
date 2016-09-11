@@ -40,8 +40,9 @@ impl Engine {
 
     /// Run the engine on a specific program.
     pub fn run<S: AsRef<str>>(&mut self, s: S) -> Result<String, Error> {
-        let syntax_tree = read(s).unwrap();
-        Ok(syntax_tree.into())
+        let _expr = read(s).unwrap();
+        // Yes, this is nonsense.
+        Ok(String::new())
     }
 
     /// Run the engine on a program from a file.

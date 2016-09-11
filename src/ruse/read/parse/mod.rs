@@ -1,8 +1,7 @@
 //! Generate a syntax tree from an input stream.
 
 pub mod error;
-pub mod stack;
-pub mod syntax_tree;
+pub mod expr;
 
 use read::lex::token::Token;
 use read::parse::error::Result;
@@ -34,8 +33,6 @@ pub trait Parse {
     ///         /       \
     /// <atom: 2>       <atom: 3>
     /// ```
-    ///
-    /// The representation is done via a stack.
     ///
     /// For now, this is done by assuming that the first item after an open
     /// paren is a function call, and that everything after is an atom. This

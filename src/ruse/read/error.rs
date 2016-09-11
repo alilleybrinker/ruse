@@ -1,12 +1,13 @@
 //! Types for handling errors in reading.
 
 use read::{lex, parse};
+use read::parse::expr::Expr;
 use std::error;
 use std::fmt;
 use std::result;
 
 /// The result of reading a string.
-pub type Result = result::Result<parse::syntax_tree::SyntaxTree, Error>;
+pub type Result = result::Result<Expr, Error>;
 
 /// Indicates an error in lexing or parsing.
 #[derive(Debug, PartialEq)]

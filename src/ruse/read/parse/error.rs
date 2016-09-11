@@ -1,12 +1,12 @@
 //! Parser error and result types.
 
-use read::parse::syntax_tree::SyntaxTree;
+use read::parse::expr::Expr;
 use std::error;
 use std::fmt;
 use std::result;
 
 /// A convenience type for returning either a SyntaxTree or a parsing error.
-pub type Result = result::Result<SyntaxTree, Error>;
+pub type Result = result::Result<Expr, Error>;
 
 /// Indicates an error in parsing.
 #[derive(Debug, PartialEq)]
