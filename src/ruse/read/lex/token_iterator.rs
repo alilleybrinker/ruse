@@ -92,7 +92,6 @@ pub trait StrTokenIterator: AsRef<str> {
 // Implement StrIterExt for all types that can be ref'ed into string slices.
 impl<T: AsRef<str>> StrTokenIterator for T {}
 
-
 /// Parse an open parenthese.
 fn lex_open_paren(iter: &TokenIterator) -> Result<Token, Error> {
     Ok(Token::open_paren(iter.is_at()))
