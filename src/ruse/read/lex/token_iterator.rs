@@ -17,7 +17,7 @@ pub struct TokenIterator<'a> {
 }
 
 /// Indicates whether to move the internal character iterator.
-enum Iterate {
+enum IterateInternally {
     Yes,
     No,
 }
@@ -32,10 +32,10 @@ impl<'a> TokenIterator<'a> {
     }
 
     /// Increment the iterator's internal location field.
-    fn next_loc(&mut self, go_to_next: Iterate) {
+    fn next_location(&mut self, go_to_next: IterateInternally) {
         self.location.set(Location(self.is_at().0 + 1));
 
-        if let Iterate::Yes = go_to_next {
+        if let IterateInternally::Yes = go_to_next {
             self.char_iter.next();
         }
     }
@@ -61,7 +61,7 @@ impl<'a> Iterator for TokenIterator<'a> {
     /// tokens are returned to the user.
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(character) = self.char_iter.next() {
-            self.next_loc(Iterate::No);
+            self.next_location(IterateInternally::No);
 
             match character {
                 '(' => return Some(lex_open_paren(&self)),
@@ -116,11 +116,11 @@ fn lex_number(iter: &mut TokenIterator, character: char) -> Result<Token, Error>
     while let Some(&next_character) = iter.char_iter.peek() {
         match next_character {
             '0'...'9' => {
-                iter.next_loc(Iterate::Yes);
+                iter.next_location(IterateInternally::Yes);
                 result.push(next_character);
             }
             '.' => {
-                iter.next_loc(Iterate::Yes);
+                iter.next_location(IterateInternally::Yes);
                 result.push(next_character);
             }
             _ => break,
@@ -155,7 +155,7 @@ fn lex_identifier(iter: &mut TokenIterator, character: char) -> Result<Token, Er
         match next_character {
             'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' | '>' |
             '?' | '^' | '_' | '~' | '0'...'9' | '+' | '-' | '.' | '@' => {
-                iter.next_loc(Iterate::Yes);
+                iter.next_location(IterateInternally::Yes);
                 result.push(next_character);
             }
             // Stop on whitespace.
