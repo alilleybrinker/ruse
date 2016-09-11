@@ -2,6 +2,7 @@
 
 pub mod error;
 pub mod token;
+#[doc(hidden)]
 pub mod token_iterator;
 
 use read::lex::error::Result;
