@@ -46,12 +46,12 @@ impl<'a> TokenIterator<'a> {
     }
 
     /// Parse an open parenthese.
-    fn parse_open_paren(&self) -> Result<Token, Error> {
+    fn lex_open_paren(&self) -> Result<Token, Error> {
         Ok(Token::open_paren(self.is_at()))
     }
 
     /// Parse a closed parenthese.
-    fn parse_close_paren(&self) -> Result<Token, Error> {
+    fn lex_close_paren(&self) -> Result<Token, Error> {
         Ok(Token::close_paren(self.is_at()))
     }
 
@@ -61,7 +61,7 @@ impl<'a> TokenIterator<'a> {
     /// floating point numbers. Eventually we'll want to cover the entire
     /// numeric tower that Scheme requires, which will demand substantially
     /// more work than is being done now.
-    fn parse_number(&mut self, character: char) -> Result<Token, Error> {
+    fn lex_number(&mut self, character: char) -> Result<Token, Error> {
         let mut result = vec![character];
         let start = self.is_at();
 
@@ -99,7 +99,7 @@ impl<'a> TokenIterator<'a> {
     /// original dispatcher, and that they are not exactly the same. There are
     /// certain characters which are acceptible within an identifier that are
     /// not acceptable at the start of one.
-    fn parse_identifier(&mut self, character: char) -> Result<Token, Error> {
+    fn lex_identifier(&mut self, character: char) -> Result<Token, Error> {
         let mut result = vec![character];
         let start = self.is_at();
 
@@ -139,12 +139,12 @@ impl<'a> Iterator for TokenIterator<'a> {
             self.next_loc(Iterate::No);
 
             match character {
-                '(' => return Some(self.parse_open_paren()),
-                ')' => return Some(self.parse_close_paren()),
-                '0'...'9' => return Some(self.parse_number(character)),
+                '(' => return Some(self.lex_open_paren()),
+                ')' => return Some(self.lex_close_paren()),
+                '0'...'9' => return Some(self.lex_number(character)),
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
                 '>' | '?' | '^' | '_' | '~' | '+' | '-' => {
-                    return Some(self.parse_identifier(character))
+                    return Some(self.lex_identifier(character))
                 }
                 // Skip whitespace.
                 ' ' | '\n' | '\t' | '\r' => (),
