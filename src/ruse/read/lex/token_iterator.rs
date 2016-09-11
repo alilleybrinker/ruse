@@ -44,81 +44,6 @@ impl<'a> TokenIterator<'a> {
     fn is_at(&self) -> Location {
         self.location.get()
     }
-
-    /// Parse an open parenthese.
-    fn lex_open_paren(&self) -> Result<Token, Error> {
-        Ok(Token::open_paren(self.is_at()))
-    }
-
-    /// Parse a closed parenthese.
-    fn lex_close_paren(&self) -> Result<Token, Error> {
-        Ok(Token::close_paren(self.is_at()))
-    }
-
-    /// Parse a number, either floating point or integer.
-    ///
-    /// Attempts to parse a number. For now, it parses only integers and
-    /// floating point numbers. Eventually we'll want to cover the entire
-    /// numeric tower that Scheme requires, which will demand substantially
-    /// more work than is being done now.
-    fn lex_number(&mut self, character: char) -> Result<Token, Error> {
-        let mut result = vec![character];
-        let start = self.is_at();
-
-        while let Some(&next_character) = self.char_iter.peek() {
-            match next_character {
-                '0'...'9' => {
-                    self.next_loc(Iterate::Yes);
-                    result.push(next_character);
-                }
-                '.' => {
-                    self.next_loc(Iterate::Yes);
-                    result.push(next_character);
-                }
-                _ => break,
-            }
-        }
-
-        let out: String = result.iter().cloned().collect();
-        let end = self.is_at();
-
-        if let Ok(val) = out.parse::<i64>() {
-            Ok(Token::integer(val, start, end))
-        } else if let Ok(val) = out.parse::<f64>() {
-            Ok(Token::float(val, start, end))
-        } else {
-            Err(Error::MalformedNumber(out))
-        }
-    }
-
-    /// Parse an identifier.
-    ///
-    /// This parses an identifier, starting with the given character, which is
-    /// passed in for convenience. Note that at the moment the character
-    /// matching rules are kept in sync manually between this function and the
-    /// original dispatcher, and that they are not exactly the same. There are
-    /// certain characters which are acceptible within an identifier that are
-    /// not acceptable at the start of one.
-    fn lex_identifier(&mut self, character: char) -> Result<Token, Error> {
-        let mut result = vec![character];
-        let start = self.is_at();
-
-        while let Some(&next_character) = self.char_iter.peek() {
-            match next_character {
-                'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
-                '>' | '?' | '^' | '_' | '~' | '0'...'9' | '+' | '-' | '.' | '@' => {
-                    self.next_loc(Iterate::Yes);
-                    result.push(next_character);
-                }
-                // Stop on whitespace.
-                ' ' | '\n' | '\t' | '\r' => break,
-                _ => return Err(Error::InvalidCharacter(next_character, start.0)),
-            }
-        }
-
-        let out: String = result.iter().cloned().collect();
-        Ok(Token::ident(out, start))
-    }
 }
 
 impl<'a> Iterator for TokenIterator<'a> {
@@ -139,12 +64,12 @@ impl<'a> Iterator for TokenIterator<'a> {
             self.next_loc(Iterate::No);
 
             match character {
-                '(' => return Some(self.lex_open_paren()),
-                ')' => return Some(self.lex_close_paren()),
-                '0'...'9' => return Some(self.lex_number(character)),
+                '(' => return Some(lex_open_paren(&self)),
+                ')' => return Some(lex_close_paren(&self)),
+                '0'...'9' => return Some(lex_number(self, character)),
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
                 '>' | '?' | '^' | '_' | '~' | '+' | '-' => {
-                    return Some(self.lex_identifier(character))
+                    return Some(lex_identifier(self, character))
                 }
                 // Skip whitespace.
                 ' ' | '\n' | '\t' | '\r' => (),
@@ -166,3 +91,79 @@ pub trait StrTokenIterator: AsRef<str> {
 
 // Implement StrIterExt for all types that can be ref'ed into string slices.
 impl<T: AsRef<str>> StrTokenIterator for T {}
+
+
+/// Parse an open parenthese.
+fn lex_open_paren(iter: &TokenIterator) -> Result<Token, Error> {
+    Ok(Token::open_paren(iter.is_at()))
+}
+
+/// Parse a closed parenthese.
+fn lex_close_paren(iter: &TokenIterator) -> Result<Token, Error> {
+    Ok(Token::close_paren(iter.is_at()))
+}
+
+/// Parse a number, either floating point or integer.
+///
+/// Attempts to parse a number. For now, it parses only integers and
+/// floating point numbers. Eventually we'll want to cover the entire
+/// numeric tower that Scheme requires, which will demand substantially
+/// more work than is being done now.
+fn lex_number(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
+    let mut result = vec![character];
+    let start = iter.is_at();
+
+    while let Some(&next_character) = iter.char_iter.peek() {
+        match next_character {
+            '0'...'9' => {
+                iter.next_loc(Iterate::Yes);
+                result.push(next_character);
+            }
+            '.' => {
+                iter.next_loc(Iterate::Yes);
+                result.push(next_character);
+            }
+            _ => break,
+        }
+    }
+
+    let out: String = result.iter().cloned().collect();
+    let end = iter.is_at();
+
+    if let Ok(val) = out.parse::<i64>() {
+        Ok(Token::integer(val, start, end))
+    } else if let Ok(val) = out.parse::<f64>() {
+        Ok(Token::float(val, start, end))
+    } else {
+        Err(Error::MalformedNumber(out))
+    }
+}
+
+/// Parse an identifier.
+///
+/// This parses an identifier, starting with the given character, which is
+/// passed in for convenience. Note that at the moment the character
+/// matching rules are kept in sync manually between this function and the
+/// original dispatcher, and that they are not exactly the same. There are
+/// certain characters which are acceptible within an identifier that are
+/// not acceptable at the start of one.
+fn lex_identifier(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
+    let mut result = vec![character];
+    let start = iter.is_at();
+
+    while let Some(&next_character) = iter.char_iter.peek() {
+        match next_character {
+            'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' | '>' |
+            '?' | '^' | '_' | '~' | '0'...'9' | '+' | '-' | '.' | '@' => {
+                iter.next_loc(Iterate::Yes);
+                result.push(next_character);
+            }
+            // Stop on whitespace.
+            ' ' | '\n' | '\t' | '\r' => break,
+            _ => return Err(Error::InvalidCharacter(next_character, start.0)),
+        }
+    }
+
+    let out: String = result.iter().cloned().collect();
+    Ok(Token::ident(out, start))
+}
