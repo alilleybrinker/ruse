@@ -33,7 +33,7 @@ impl<'a> TokenIterator<'a> {
 
     /// Increment the iterator's internal location field.
     fn next_location(&mut self, go_to_next: IterateInternally) {
-        self.location.set(Location(self.is_at().0 + 1));
+        self.location.set(Location(self.location().0 + 1));
 
         if let IterateInternally::Yes = go_to_next {
             self.char_iter.next();
@@ -41,7 +41,7 @@ impl<'a> TokenIterator<'a> {
     }
 
     /// Get the current location of the parser in the input text.
-    fn is_at(&self) -> Location {
+    fn location(&self) -> Location {
         self.location.get()
     }
 }
@@ -76,7 +76,7 @@ impl<'a> Iterator for TokenIterator<'a> {
                 }
                 // Skip whitespace.
                 ' ' | '\n' | '\t' | '\r' => (),
-                _ => return Some(Err(Error::InvalidCharacter(character, self.is_at().0))),
+                _ => return Some(Err(Error::InvalidCharacter(character, self.location().0))),
             }
         }
 
@@ -97,12 +97,12 @@ impl<T: AsRef<str>> StrTokenIterator for T {}
 
 /// Parse an open parenthese.
 fn lex_open_paren(iter: &TokenIterator) -> Result<Token, Error> {
-    Ok(Token::open_paren(iter.is_at()))
+    Ok(Token::open_paren(iter.location()))
 }
 
 /// Parse a closed parenthese.
 fn lex_close_paren(iter: &TokenIterator) -> Result<Token, Error> {
-    Ok(Token::close_paren(iter.is_at()))
+    Ok(Token::close_paren(iter.location()))
 }
 
 /// Parse a number, either floating point or integer.
@@ -113,7 +113,7 @@ fn lex_close_paren(iter: &TokenIterator) -> Result<Token, Error> {
 /// more work than is being done now.
 fn lex_number(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
     let mut result = vec![character];
-    let start = iter.is_at();
+    let start = iter.location();
 
     while let Some(&next_character) = iter.char_iter.peek() {
         match next_character {
@@ -130,7 +130,7 @@ fn lex_number(iter: &mut TokenIterator, character: char) -> Result<Token, Error>
     }
 
     let out: String = result.iter().cloned().collect();
-    let end = iter.is_at();
+    let end = iter.location();
 
     if let Ok(val) = out.parse::<i64>() {
         Ok(Token::integer(val, start, end))
@@ -151,7 +151,7 @@ fn lex_number(iter: &mut TokenIterator, character: char) -> Result<Token, Error>
 /// not acceptable at the start of one.
 fn lex_identifier(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
     let mut result = vec![character];
-    let start = iter.is_at();
+    let start = iter.location();
 
     while let Some(&next_character) = iter.char_iter.peek() {
         match next_character {
