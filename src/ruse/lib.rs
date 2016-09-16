@@ -14,9 +14,10 @@
 //! reach this point. But it's sure fun to play with!
 
 pub mod read;
+pub mod error;
 
+use error::Result;
 use read::read;
-use read::parse::error::Error;
 use std::path::Path;
 use std::fs::File;
 use std::io::Read;
@@ -39,8 +40,8 @@ impl Engine {
     }
 
     /// Run the engine on a specific program.
-    pub fn run<S: AsRef<str>>(&mut self, s: S) -> Result<String, Error> {
-        let _expr = read(s).unwrap();
+    pub fn run<S: AsRef<str>>(&mut self, s: S) -> Result {
+        let _expr = try!(read(s));
         // Yes, this is nonsense.
         Ok(String::new())
     }
@@ -48,7 +49,7 @@ impl Engine {
     /// Run the engine on a program from a file.
     ///
     /// TODO: Remove the unwrapping from this function.
-    pub fn run_file<S: AsRef<Path>>(&mut self, s: S) -> Result<String, Error> {
+    pub fn run_file<S: AsRef<Path>>(&mut self, s: S) -> Result {
         let mut f = File::open(s).unwrap();
         let mut buffer = String::new();
         f.read_to_string(&mut buffer).unwrap();
