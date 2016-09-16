@@ -5,12 +5,18 @@
 /// integers, and floats.
 #[derive(Debug)]
 pub enum Expr {
-    /// A string
-    Str(String),
+    /// An atom
+    Atom(String),
+    /// A list
+    List(Vec<Expr>),
+    /// A dotted list
+    DottedList(Vec<Expr>, Expr),
     /// An integer
     Integer(i64),
     /// A float
     Float(f64),
-    /// A list
-    List(Vec<Box<Expr>>),
+    /// A string
+    Str(String),
+    /// A bool
+    Bool(bool),
 }

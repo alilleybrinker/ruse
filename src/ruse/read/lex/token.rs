@@ -14,6 +14,10 @@ pub enum TokenKind {
     Integer(i64),
     /// A floating point literal.
     Float(f64),
+    /// A string
+    Str(String),
+    /// A boolean
+    Bool(bool),
 }
 
 /// The location of a token in an input stream.
@@ -76,6 +80,18 @@ impl Token {
         }
     }
 
+    /// Token constructor for strings.
+    pub fn string<S: Into<String>>(text: S, location: Location) -> Token {
+        let name: String = name.into();
+        let len = name.len();
+
+        Token {
+            kind: TokenKind::Str(name),
+            location: location,
+            span: Span(len),
+        }
+    }
+
     /// Token constructor for integers.
     pub fn integer(value: i64, start_location: Location, end_location: Location) -> Token {
         Token {
@@ -91,6 +107,17 @@ impl Token {
             kind: TokenKind::Float(value),
             location: start_location,
             span: start_location.to(end_location),
+        }
+    }
+
+    /// Token constructor for bools.
+    ///
+    /// The span is always 2, because true is always `#t` and false is always `#f`.
+    pub fn bool(value: bool, start_location: Location) -> Token {
+        Token {
+            kind: TokenKind::Bool(value),
+            location: start_location,
+            span: 2,
         }
     }
 }

@@ -29,14 +29,8 @@ pub trait Parse {
     /// Becomes:
     ///
     /// ```text
-    ///         <fn: '+'>
-    ///         /       \
-    /// <atom: 2>       <atom: 3>
+    /// Expr::List(Vec(Expr::Str("+"), Expr::Integer(2), Expr::Integer(3)))
     /// ```
-    ///
-    /// For now, this is done by assuming that the first item after an open
-    /// paren is a function call, and that everything after is an atom. This
-    /// will obviously become better over time.
     fn parse(&self) -> Result {
         unimplemented!()
     }
