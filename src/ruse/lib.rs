@@ -14,6 +14,8 @@
 //! reach this point. But it's sure fun to play with!
 
 pub mod read;
+pub mod eval;
+pub mod print;
 pub mod error;
 
 use error::Result;
