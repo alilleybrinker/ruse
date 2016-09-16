@@ -11,9 +11,9 @@ pub enum TokenKind {
     /// An identifier.
     Ident(String),
     /// An integer literal.
-    IntegerLiteral(i64),
+    Integer(i64),
     /// A floating point literal.
-    FloatLiteral(f64),
+    Float(f64),
 }
 
 /// The location of a token in an input stream.
@@ -79,7 +79,7 @@ impl Token {
     /// Token constructor for integers.
     pub fn integer(value: i64, start_location: Location, end_location: Location) -> Token {
         Token {
-            kind: TokenKind::IntegerLiteral(value),
+            kind: TokenKind::Integer(value),
             location: start_location,
             span: start_location.to(end_location),
         }
@@ -88,7 +88,7 @@ impl Token {
     /// Token constructor for floats.
     pub fn float(value: f64, start_location: Location, end_location: Location) -> Token {
         Token {
-            kind: TokenKind::FloatLiteral(value),
+            kind: TokenKind::Float(value),
             location: start_location,
             span: start_location.to(end_location),
         }
