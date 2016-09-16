@@ -5,7 +5,7 @@ use std::error;
 use std::fmt;
 use std::result;
 
-/// A convenience type for returning either a SyntaxTree or a parsing error.
+/// A convenience type for returning either an `Expr` or a parsing error.
 pub type Result = result::Result<Expr, Error>;
 
 /// Indicates an error in parsing.

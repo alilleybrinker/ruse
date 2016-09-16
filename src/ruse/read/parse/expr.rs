@@ -8,9 +8,9 @@ pub enum Expr {
     /// An atom
     Atom(String),
     /// A list
-    List(Vec<Expr>),
+    List(Vec<Box<Expr>>),
     /// A dotted list
-    DottedList(Vec<Expr>, Expr),
+    DottedList(Vec<Box<Expr>>, Box<Expr>),
     /// An integer
     Integer(i64),
     /// A float

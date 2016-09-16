@@ -82,11 +82,11 @@ impl Token {
 
     /// Token constructor for strings.
     pub fn string<S: Into<String>>(text: S, location: Location) -> Token {
-        let name: String = name.into();
-        let len = name.len();
+        let text: String = text.into();
+        let len = text.len();
 
         Token {
-            kind: TokenKind::Str(name),
+            kind: TokenKind::Str(text),
             location: location,
             span: Span(len),
         }
@@ -117,7 +117,7 @@ impl Token {
         Token {
             kind: TokenKind::Bool(value),
             location: start_location,
-            span: 2,
+            span: Span(2),
         }
     }
 }

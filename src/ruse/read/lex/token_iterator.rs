@@ -24,7 +24,7 @@ enum IterateInternally {
 
 impl<'a> TokenIterator<'a> {
     /// Create a new TokenIterator to iterate over the given string.
-    pub fn new<'b>(s: &'b str) -> TokenIterator<'b> {
+    pub fn new(s: &str) -> TokenIterator {
         TokenIterator {
             char_iter: s.chars().peekable(),
             location: Cell::new(Location(0)),
@@ -67,8 +67,8 @@ impl<'a> Iterator for TokenIterator<'a> {
             // allowable characters for identifiers are fewer here then they are in the
             // lex_atom function.
             match character {
-                '(' => return Some(lex_open_paren(&self)),
-                ')' => return Some(lex_close_paren(&self)),
+                '(' => return Some(lex_open_paren(self)),
+                ')' => return Some(lex_close_paren(self)),
                 '0'...'9' => return Some(lex_number(self, character)),
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
                 '>' | '?' | '^' | '_' | '~' | '+' | '-' => return Some(lex_atom(self, character)),
@@ -85,7 +85,7 @@ impl<'a> Iterator for TokenIterator<'a> {
 /// Extend a stringy type with the ability to generate tokens.
 pub trait StrTokenIterator: AsRef<str> {
     /// Convenience method to get a token iterator for a string.
-    fn tokens<'a>(&'a self) -> TokenIterator<'a> {
+    fn tokens(&self) -> TokenIterator {
         TokenIterator::new(self.as_ref())
     }
 }
@@ -115,11 +115,7 @@ fn lex_number(iter: &mut TokenIterator, character: char) -> Result<Token, Error>
 
     while let Some(&next_character) = iter.char_iter.peek() {
         match next_character {
-            '0'...'9' => {
-                iter.next_location(IterateInternally::Yes);
-                result.push(next_character);
-            }
-            '.' => {
+            '0'...'9' | '.' => {
                 iter.next_location(IterateInternally::Yes);
                 result.push(next_character);
             }

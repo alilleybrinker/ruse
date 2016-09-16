@@ -33,12 +33,13 @@ use std::io::Read;
 /// provide a way for the user to register new bindings. There will also
 /// be a utility to register bindings on the Ruse side, to be callable
 /// from the Rust side.
+#[derive(Default)]
 pub struct Engine {}
 
 impl Engine {
     /// Create a new Engine.
     pub fn new() -> Engine {
-        Engine {}
+        Default::default()
     }
 
     /// Run the engine on a specific program.
