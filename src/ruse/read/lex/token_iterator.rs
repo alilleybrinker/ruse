@@ -69,6 +69,7 @@ impl<'a> Iterator for TokenIterator<'a> {
             match character {
                 '(' => return Some(lex_open_paren(self)),
                 ')' => return Some(lex_close_paren(self)),
+                '#' => return Some(lex_boolean(self, character)),
                 '0'...'9' => return Some(lex_number(self, character)),
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
                 '>' | '?' | '^' | '_' | '~' | '+' | '-' => return Some(lex_atom(self, character)),
@@ -131,7 +132,7 @@ fn lex_number(iter: &mut TokenIterator, character: char) -> Result<Token, Error>
     } else if let Ok(val) = out.parse::<f64>() {
         Ok(Token::float(val, start, end))
     } else {
-        Err(Error::MalformedNumber(out))
+        Err(Error::MalformedNumber(out, start.0))
     }
 }
 
@@ -161,5 +162,58 @@ fn lex_atom(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
     }
 
     let out: String = result.iter().cloned().collect();
+
     Ok(Token::ident(out, start))
+}
+
+/// Lex a boolean value.
+fn lex_boolean(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
+    let mut result = vec![character];
+    let start = iter.location();
+    let mut counter = 1;
+
+    while let Some(&next_character) = iter.char_iter.peek() {
+        match next_character {
+            'a'...'z' | 'A'...'Z' => {
+                iter.next_location(IterateInternally::Yes);
+                result.push(next_character);
+            }
+            ' ' | '\n' | '\t' | '\r' => break,
+            _ => return Err(Error::InvalidCharacter(next_character, start.0)),
+        }
+
+        counter += 1;
+
+        if counter == 2 {
+            let out: String = result.iter().cloned().collect();
+            let end = iter.location();
+
+            if out == "#t" {
+                return Ok(Token::boolean(true, start, end));
+            } else if out == "#f" {
+                return Ok(Token::boolean(false, start, end));
+            }
+        }
+
+        if counter == 5 {
+            let out: String = result.iter().cloned().collect();
+            let end = iter.location();
+
+            if out == "#true" {
+                return Ok(Token::boolean(true, start, end));
+            }
+        }
+
+        if counter == 6 {
+            let out: String = result.iter().cloned().collect();
+            let end = iter.location();
+
+            if out == "#false" {
+                return Ok(Token::boolean(false, start, end));
+            }
+        }
+    }
+
+    let out: String = result.iter().cloned().collect();
+    Err(Error::InvalidLiteral(out, start.0))
 }

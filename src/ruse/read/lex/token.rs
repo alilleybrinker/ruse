@@ -111,13 +111,11 @@ impl Token {
     }
 
     /// Token constructor for bools.
-    ///
-    /// The span is always 2, because true is always `#t` and false is always `#f`.
-    pub fn bool(value: bool, start_location: Location) -> Token {
+    pub fn boolean(value: bool, start_location: Location, end_location: Location) -> Token {
         Token {
             kind: TokenKind::Bool(value),
             location: start_location,
-            span: Span(2),
+            span: start_location.to(end_location),
         }
     }
 }

@@ -16,7 +16,9 @@ pub enum Error {
     /// Character and location
     InvalidCharacter(char, usize),
     /// The almost-number.
-    MalformedNumber(String),
+    MalformedNumber(String, usize),
+    /// An almost-literal
+    InvalidLiteral(String, usize),
 }
 
 impl error::Error for Error {
@@ -25,6 +27,7 @@ impl error::Error for Error {
         match *self {
             Error::InvalidCharacter(..) => "invalid character",
             Error::MalformedNumber(..) => "malformed number",
+            Error::InvalidLiteral(..) => "invalid literal",
         }
     }
 }
@@ -39,7 +42,12 @@ impl fmt::Display for Error {
                        character,
                        location)
             }
-            Error::MalformedNumber(ref number) => write!(f, "malformed number: {}", number),
+            Error::MalformedNumber(ref number, location) => {
+                write!(f, "malformed number '{}' at column '{}'", number, location)
+            }
+            Error::InvalidLiteral(ref string, location) => {
+                write!(f, "invalid literal '{}' at column '{}'", string, location)
+            }
         }
     }
 }
