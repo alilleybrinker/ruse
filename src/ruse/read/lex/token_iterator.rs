@@ -155,8 +155,8 @@ fn lex_atom(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
                 iter.next_location(IterateInternally::Yes);
                 result.push(next_character);
             }
-            // Stop on whitespace.
-            ' ' | '\n' | '\t' | '\r' => break,
+            // Stop on whitespace or parentheses.
+            '(' | ')' | ' ' | '\n' | '\t' | '\r' => break,
             _ => return Err(Error::InvalidCharacter(next_character, start.0)),
         }
     }
@@ -170,7 +170,6 @@ fn lex_atom(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
 fn lex_boolean(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
     let mut result = vec![character];
     let start = iter.location();
-    let mut counter = 1;
 
     while let Some(&next_character) = iter.char_iter.peek() {
         match next_character {
@@ -178,42 +177,19 @@ fn lex_boolean(iter: &mut TokenIterator, character: char) -> Result<Token, Error
                 iter.next_location(IterateInternally::Yes);
                 result.push(next_character);
             }
-            ' ' | '\n' | '\t' | '\r' => break,
+            '(' | ')' | ' ' | '\n' | '\t' | '\r' => break,
             _ => return Err(Error::InvalidCharacter(next_character, start.0)),
-        }
-
-        counter += 1;
-
-        if counter == 2 {
-            let out: String = result.iter().cloned().collect();
-            let end = iter.location();
-
-            if out == "#t" {
-                return Ok(Token::boolean(true, start, end));
-            } else if out == "#f" {
-                return Ok(Token::boolean(false, start, end));
-            }
-        }
-
-        if counter == 5 {
-            let out: String = result.iter().cloned().collect();
-            let end = iter.location();
-
-            if out == "#true" {
-                return Ok(Token::boolean(true, start, end));
-            }
-        }
-
-        if counter == 6 {
-            let out: String = result.iter().cloned().collect();
-            let end = iter.location();
-
-            if out == "#false" {
-                return Ok(Token::boolean(false, start, end));
-            }
         }
     }
 
     let out: String = result.iter().cloned().collect();
-    Err(Error::InvalidLiteral(out, start.0))
+    let end = iter.location();
+
+    if out == "#t" || out == "#true" {
+        return Ok(Token::boolean(true, start, end));
+    } else if out == "#f" || out == "#false" {
+        return Ok(Token::boolean(false, start, end));
+    } else {
+        Err(Error::InvalidLiteral(out, start.0))
+    }
 }

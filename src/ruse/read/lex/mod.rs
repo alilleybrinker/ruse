@@ -103,11 +103,20 @@ mod tests {
     }
 
     #[test]
-    fn lex_a_boolean() {
+    fn lex_a_short_boolean() {
         let result = "(#t)".lex();
         let expected = Ok(vec![Token::open_paren(Location(1)),
                                Token::boolean(true, Location(2), Location(3)),
                                Token::close_paren(Location(4))]);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn lex_a_long_boolean() {
+        let result = "(#false)".lex();
+        let expected = Ok(vec![Token::open_paren(Location(1)),
+                               Token::boolean(false, Location(2), Location(7)),
+                               Token::close_paren(Location(8))]);
         assert_eq!(result, expected);
     }
 }
