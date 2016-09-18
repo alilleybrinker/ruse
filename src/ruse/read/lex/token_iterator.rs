@@ -177,6 +177,7 @@ fn lex_boolean(iter: &mut TokenIterator, character: char) -> Result<Token, Error
                 iter.next_location(IterateInternally::Yes);
                 result.push(next_character);
             }
+            // Stop on whitespace or parentheses.
             '(' | ')' | ' ' | '\n' | '\t' | '\r' => break,
             _ => return Err(Error::InvalidCharacter(next_character, start.0)),
         }

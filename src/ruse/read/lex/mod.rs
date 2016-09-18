@@ -119,4 +119,11 @@ mod tests {
                                Token::close_paren(Location(8))]);
         assert_eq!(result, expected);
     }
+
+    #[test]
+    fn lex_an_invalid_literal() {
+        let result = "(#what)".lex();
+        let expected = Err(Error::InvalidLiteral("#what".to_string(), 2));
+        assert_eq!(result, expected);
+    }
 }
