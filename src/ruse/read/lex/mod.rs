@@ -146,4 +146,17 @@ mod tests {
         ]);
         assert_eq!(result, expected);
     }
+
+    #[test]
+    fn lex_a_string_with_an_escape_equence() {
+        let result = "(g \"hello\n\" 4)".lex();
+        let expected = Ok(vec![
+            Token::open_paren(Location(1)),
+            Token::ident("g", Location(2)),
+            Token::string("hello\n", Location(4)),
+            Token::integer(4, Location(13), Location(13)),
+            Token::close_paren(Location(14)),
+        ]);
+        assert_eq!(result, expected);
+    }
 }
