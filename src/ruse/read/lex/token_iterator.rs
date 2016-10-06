@@ -228,6 +228,7 @@ fn lex_string(iter: &mut TokenIterator, character: char) -> Result<Token, Error>
                 result.push('\r');
             }
             x if character == x && escape => {
+                escape = false;
                 iter.next_location(IterateInternally::Yes);
                 result.push(x)
             }
