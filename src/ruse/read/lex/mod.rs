@@ -126,4 +126,24 @@ mod tests {
         let expected = Err(Error::InvalidLiteral("#what".to_string(), 2));
         assert_eq!(result, expected);
     }
+
+    #[test]
+    fn lex_a_string() {
+        let result = "\"hello\"".lex();
+        let expected = Ok(vec![Token::string("hello".to_string(), Location(1))]);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn lex_a_string_in_a_function() {
+        let result = "(f 2 \"blah\")".lex();
+        let expected = Ok(vec![
+            Token::open_paren(Location(1)),
+            Token::ident("f", Location(2)),
+            Token::integer(2, Location(4), Location(4)),
+            Token::string("blah", Location(6)),
+            Token::close_paren(Location(12)),
+        ]);
+        assert_eq!(result, expected);
+    }
 }

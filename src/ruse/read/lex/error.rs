@@ -19,6 +19,8 @@ pub enum Error {
     MalformedNumber(String, usize),
     /// An almost-literal
     InvalidLiteral(String, usize),
+    /// An almost-escape sequence
+    InvalidEscapeSequence(String, usize),
 }
 
 impl error::Error for Error {
@@ -28,6 +30,7 @@ impl error::Error for Error {
             Error::InvalidCharacter(..) => "invalid character",
             Error::MalformedNumber(..) => "malformed number",
             Error::InvalidLiteral(..) => "invalid literal",
+            Error::InvalidEscapeSequence(..) => "invalid escape sequence",
         }
     }
 }
@@ -47,6 +50,12 @@ impl fmt::Display for Error {
             }
             Error::InvalidLiteral(ref string, location) => {
                 write!(f, "invalid literal '{}' at column '{}'", string, location)
+            }
+            Error::InvalidEscapeSequence(ref string, location) => {
+                write!(f,
+                       "invalid escape sequence '{}' at column '{}'",
+                       string,
+                       location)
             }
         }
     }

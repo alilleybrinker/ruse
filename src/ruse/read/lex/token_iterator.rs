@@ -73,6 +73,7 @@ impl<'a> Iterator for TokenIterator<'a> {
                 '0'...'9' => return Some(lex_number(self, character)),
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
                 '>' | '?' | '^' | '_' | '~' | '+' | '-' => return Some(lex_atom(self, character)),
+                '"' => return Some(lex_string(self, character)),
                 // Skip whitespace.
                 ' ' | '\n' | '\t' | '\r' => (),
                 _ => return Some(Err(Error::InvalidCharacter(character, self.location().0))),
@@ -193,4 +194,60 @@ fn lex_boolean(iter: &mut TokenIterator, character: char) -> Result<Token, Error
     } else {
         Err(Error::InvalidLiteral(out, start.0))
     }
+}
+
+/// Lex a string literal.
+fn lex_string(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
+    let mut result = Vec::new();
+    let mut escape = false;
+    let start = iter.location();
+
+    while let Some(&next_character) = iter.char_iter.peek() {
+        match next_character {
+            '\\' if !escape => {
+                escape = true;
+                iter.next_location(IterateInternally::Yes);
+            }
+            '\\' if escape => {
+                escape = false;
+                iter.next_location(IterateInternally::Yes);
+                result.push('\\');
+            }
+            't' if escape => {
+                escape = false;
+                iter.next_location(IterateInternally::Yes);
+                result.push('\t');
+            }
+            'n' if escape => {
+                escape = false;
+                iter.next_location(IterateInternally::Yes);
+                result.push('\n');
+            }
+            'r' if escape => {
+                escape = false;
+                iter.next_location(IterateInternally::Yes);
+                result.push('\r');
+            }
+            x if character == x && escape => {
+                iter.next_location(IterateInternally::Yes);
+                result.push(x)
+            }
+            x if character == x && !escape => {
+                iter.next_location(IterateInternally::Yes);
+                break;
+            }
+            _ if escape => {
+                let sequence = format!("\\{}", next_character);
+                return Err(Error::InvalidEscapeSequence(sequence, iter.location().0));
+            }
+            _ => {
+                escape = false;
+                iter.next_location(IterateInternally::Yes);
+                result.push(next_character);
+            }
+        }
+    }
+
+    let out: String = result.iter().cloned().collect();
+    Ok(Token::string(out, start))
 }
