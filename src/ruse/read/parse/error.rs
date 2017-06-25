@@ -12,8 +12,10 @@ pub type Result = result::Result<Expr, Error>;
 #[derive(Debug, PartialEq)]
 pub enum Error {
     /// Indicates that there were no outer parentheses.
+    /// 表示没有外圆括号。
     NoEnclosingParens,
     /// Indicates that the parentheses were not matched.
+    /// 表示括号不匹配。
     UnmatchedParens,
 }
 
