@@ -2,7 +2,7 @@
 
 /// The different types of Token. Some token kinds require additional data,
 /// and will carry it here.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TokenKind {
     /// A single open parenthese.
     OpenParen,
