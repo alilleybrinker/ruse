@@ -6,6 +6,7 @@ pub mod expr;
 
 use read::lex::token::{Token, TokenKind};
 use read::parse::error::{Result, Error};
+use read::parse::expr::Expr;
 
 /// Parse an input string, returning a Ruse expression that can be evaluated.
 /// 解析输入字符串，返回可评估的 Ruse 表达式。
@@ -19,16 +20,18 @@ impl Parse for Vec<Token> {
     /// Parse a vector of tokens into an AST.
     /// 将标记序列解析为 AST。
     fn parse(&self) -> Result {
+        let ast:Option<Expr> = None;
         let mut parens_flag = 0;
         for token in self {
             let kind = token.kind.clone();
             if parens_flag == 0 && kind != TokenKind::OpenParen || parens_flag == -1{
                 return Err(Error::NoEnclosingParens);
             }
+            
+            // Will it be better to use the match here?
             if kind == TokenKind::OpenParen {
                 parens_flag += 1;
-            }
-            if kind == TokenKind::CloseParen {
+            }else if kind == TokenKind::CloseParen {
                 parens_flag -= 1;
                 if parens_flag == 0 {
                     parens_flag = -1;
@@ -38,8 +41,10 @@ impl Parse for Vec<Token> {
         if parens_flag != 0 {
             Err(Error::UnmatchedParens)
         } else {
-            // TODO
-            unimplemented!()
+            match ast {
+                Some(a) => Ok(a),
+                None => Err(Error::EmptyParens),
+            }
         }
     }
 }
