@@ -15,8 +15,8 @@ pub enum Error {
     NoEnclosingParens,
     /// Indicates that the parentheses were not matched.
     UnmatchedParens,
-    /// Indicates that the parentheses are empty.
-    EmptyParens,
+    /// Indicates that the program is empty.
+    EmptyProgram,
 }
 
 impl error::Error for Error {
@@ -25,7 +25,7 @@ impl error::Error for Error {
         match *self {
             Error::NoEnclosingParens => "no enclosing parens",
             Error::UnmatchedParens => "unmatched parens",
-            Error::EmptyParens => "empty parens",
+            Error::EmptyProgram => "empty program",
         }
     }
 }

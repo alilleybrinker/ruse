@@ -58,7 +58,7 @@ impl Parse for Vec<Token> {
         } else {
             match ast {
                 Some(a) => Ok(a),
-                None => Err(Error::EmptyParens),
+                None => Err(Error::EmptyProgram),
             }
         }
     }
