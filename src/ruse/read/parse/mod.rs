@@ -54,12 +54,12 @@ impl Parse for Vec<Token> {
         }
 
         if parens.not_matching() {
-            Err(Error::UnmatchedParens)
-        } else {
-            match ast {
-                Some(a) => Ok(a),
-                None => Err(Error::EmptyProgram),
-            }
+            return Err(Error::UnmatchedParens);
+        }
+
+        match ast {
+            Some(a) => Ok(a),
+            None => Err(Error::EmptyProgram),
         }
     }
 }
