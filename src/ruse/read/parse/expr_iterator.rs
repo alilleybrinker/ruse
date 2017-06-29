@@ -1,5 +1,4 @@
 //! An iterator for parsing an expression from a stream of tokens.
-//! 用于从标记流解析表达式的迭代器。
 
 use read::parse::error::Error;
 use read::parse::expr::Expr;
