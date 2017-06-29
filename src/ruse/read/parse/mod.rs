@@ -13,38 +13,47 @@ pub trait Parse {
     fn parse(&self) -> Result;
 }
 
+struct Parens {
+    count: i64,
+}
+
+impl Parens {
+    fn new() -> Self {
+        Parens {
+            count: 0
+        }
+    }
+
+    fn matching(&self) -> bool {
+        if self.count > 0 { false }
+        else { true }
+    }
+
+    fn not_matching(&self) -> bool {
+        !self.matching()
+    }
+}
+
 impl Parse for Vec<Token> {
     /// Parse a vector of tokens into an AST.
     fn parse(&self) -> Result {
         let ast: Option<_> = None;
-        let mut has_parens = 0;
+        let mut parens = Parens::new();
 
         for token in self {
-            if has_parens == -1 {
+            if parens.matching() && token.kind != TokenKind::OpenParen {
                 return Err(Error::NoEnclosingParens);
             }
 
             match token.kind {
-                TokenKind::OpenParen => {
-                    if has_parens == 0 && token.kind != TokenKind::OpenParen {
-                        return Err(Error::NoEnclosingParens);
-                    }
-
-                    has_parens += 1;
-                }
-                TokenKind::CloseParen => {
-                    has_parens -= 1;
-
-                    if has_parens == 0 {
-                        has_parens = -1;
-                    }
-                }
+                TokenKind::OpenParen => parens.count += 1,
+                TokenKind::CloseParen => parens.count -= 1,
                 // TODO: Fill this out with parsing of other things.
                 _ => {}
             }
         }
 
-        if has_parens != 0 {
+        if parens.not_matching() {
             Err(Error::UnmatchedParens)
         } else {
             match ast {
