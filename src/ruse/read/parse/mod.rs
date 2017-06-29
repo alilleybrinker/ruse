@@ -10,32 +10,41 @@ use read::parse::expr::Expr;
 /// Parse an input string, returning a Ruse expression that can be evaluated.
 pub trait Parse {
     /// Parse a type into an AST.
-    /// 将类型解析为 AST。
     fn parse(&self) -> Result;
 }
 
 impl Parse for Vec<Token> {
     /// Parse a vector of tokens into an AST.
     fn parse(&self) -> Result {
-        let ast:Option<Expr> = None;
-        let mut parens_flag = 0;
+        let ast: Option<_> = None;
+        let mut has_parens = 0;
+
         for token in self {
-            let kind = token.kind.clone();
-            if parens_flag == 0 && kind != TokenKind::OpenParen || parens_flag == -1{
+            if has_parens == -1 {
                 return Err(Error::NoEnclosingParens);
             }
 
-            // Will it be better to use the match here?
-            if kind == TokenKind::OpenParen {
-                parens_flag += 1;
-            }else if kind == TokenKind::CloseParen {
-                parens_flag -= 1;
-                if parens_flag == 0 {
-                    parens_flag = -1;
+            match token.kind {
+                TokenKind::OpenParen => {
+                    if has_parens == 0 && token.kind != TokenKind::OpenParen {
+                        return Err(Error::NoEnclosingParens);
+                    }
+
+                    has_parens += 1;
                 }
+                TokenKind::CloseParen => {
+                    has_parens -= 1;
+
+                    if has_parens == 0 {
+                        has_parens = -1;
+                    }
+                }
+                // TODO: Fill this out with parsing of other things.
+                _ => {}
             }
         }
-        if parens_flag != 0 {
+
+        if has_parens != 0 {
             Err(Error::UnmatchedParens)
         } else {
             match ast {
