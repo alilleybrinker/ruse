@@ -19,7 +19,7 @@ impl<T: AsRef<str>> Lex for T {}
 
 #[cfg(test)]
 mod tests {
-    use lex::lex::Lex;
+    use lex::Lex;
     use lex::token::{Token, Location};
     use lex::error::Error;
 
