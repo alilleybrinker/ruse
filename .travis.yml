@@ -11,4 +11,6 @@ matrix:
     - rust: nightly
 sudo: false
 cache: cargo
-script: cd ruse && cargo build
+script:
+    - cd ruse && cargo build --verbose
+    - cd ruse && cargo test --verbose
