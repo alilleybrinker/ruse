@@ -1,14 +1,5 @@
 language: rust
-rust:
-  # For now, Ruse is nightly-only. I'd like to fix this in the long term,
-  # but it's how things are for now.
-  #
-  #- stable
-  #- beta
-  - nightly
-matrix:
-  allow_failures:
-    - rust: nightly
+rust: nightly
 sudo: false
 cache: cargo
 script:
