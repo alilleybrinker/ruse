@@ -1,8 +1,5 @@
 //! Generate a syntax tree from an input stream.
 
-pub mod error;
-pub mod expr;
-
 use read::lex::token::{Token, TokenKind};
 use read::parse::error::{Result, Error};
 use read::parse::expr::Expr;

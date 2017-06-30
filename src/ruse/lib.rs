@@ -1,5 +1,3 @@
-#![deny(missing_docs)]
-
 //! Ruse is an embedded Scheme for Rust. It is currently in the very early
 //! stages, and should not be used for anything.
 //!
@@ -12,16 +10,33 @@
 //! This is obviously an amibitious project, and I don't know when/if Ruse will
 //! reach this point. But it's sure fun to play with!
 
-pub mod read;
+pub mod read {
+    pub mod lex {
+        pub mod error;
+        pub mod token;
+        pub mod lex;
+    }
+
+    pub mod parse {
+        pub mod error;
+        pub mod expr;
+        pub mod parse;
+    }
+
+    pub mod error;
+    pub mod read;
+}
+
 pub mod eval;
 pub mod print;
 pub mod error;
 
-use error::Result;
-use read::read;
 use std::path::Path;
 use std::fs::File;
 use std::io::Read;
+
+use error::Result;
+use read::read::read;
 
 /// The entry point for running Ruse programs.
 ///
@@ -43,7 +58,7 @@ impl Engine {
 
     /// Run the engine on a specific program.
     pub fn run<S: AsRef<str>>(&mut self, s: S) -> Result {
-        let _expr = try!(read(s));
+        let _expr = read(s)?;
         // Yes, this is nonsense.
         Ok(String::new())
     }
@@ -54,7 +69,7 @@ impl Engine {
     pub fn run_file<S: AsRef<Path>>(&mut self, s: S) -> Result {
         let mut f = File::open(s).unwrap();
         let mut buffer = String::new();
-        f.read_to_string(&mut buffer).unwrap();
+        f.read_to_string(&mut buffer).expect("could not read file");
 
         self.run(buffer)
     }
