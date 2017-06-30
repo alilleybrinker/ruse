@@ -3,7 +3,8 @@ rust: nightly
 sudo: false
 cache: cargo
 script:
-    - cd ruse && cargo build --verbose
-    - cd ruse && cargo clean
-    - cd ruse && cargo test --verbose
-    - cd ruse && cargo clean
+    - cd ruse
+    - cargo build --verbose
+    - cargo clean
+    - cargo test --verbose
+    - cargo clean
