@@ -14,7 +14,7 @@ name = "ruse"
 path = "src/lib.rs"
 
 [dependencies]
-read = { path = "../libread" }
-eval = { path = "../libeval" }
-print = { path = "../libprint" }
+read = { path = "../libruse-read" }
+eval = { path = "../libruse-eval" }
+print = { path = "../libruse-print" }
 

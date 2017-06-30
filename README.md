@@ -49,7 +49,7 @@ Ruse is structured currently into 5 separate Rust crates.
 
 - `ruse` is the Ruse interpreter, and is a binary.
 - `libruse` is the library interface to Ruse. The CLI just uses `libruse`.
-- `libread` is the reading portion of the interpreter.
-- `libeval` is the evaluation portion of the interpreter.
-- `libprint` is the printing portion of the interpreter.
+- `libruse-read` is the reading portion of the interpreter.
+- `libruse-eval` is the evaluation portion of the interpreter.
+- `libruse-print` is the printing portion of the interpreter.
 
