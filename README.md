@@ -31,11 +31,6 @@ with implementing a programming language, without the pressure of concern that
 anyone will actually use it. That said, if you do use it, let us know how it
 goes.
 
-## Status
-
-This is a brand new project, and the initial goal is simply to get a simple
-base Scheme working. This project will take a very iterative approach.
-
 ## Contributing
 
 All discussions and contributions will be handled via GitHub Issues and Pull
