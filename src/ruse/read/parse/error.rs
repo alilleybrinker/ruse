@@ -17,6 +17,8 @@ pub enum Error {
     UnmatchedParens,
     /// Indicates that the program is empty.
     EmptyProgram,
+    /// Indicates an identifier was found in an unexpected position.
+    UnexpectedIdentifier(String),
 }
 
 impl error::Error for Error {
@@ -26,6 +28,7 @@ impl error::Error for Error {
             Error::NoEnclosingParens => "no enclosing parens",
             Error::UnmatchedParens => "unmatched parens",
             Error::EmptyProgram => "empty program",
+            Error::UnexpectedIdentifier(..) => "unexpected identifier",
         }
     }
 }
@@ -33,6 +36,11 @@ impl error::Error for Error {
 impl fmt::Display for Error {
     /// More detailed information about the error.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", (self as &error::Error).description())
+        match *self {
+            Error::UnexpectedIdentifier(ref s) => {
+                write!(f, "unexpected identifier '{}'", s)
+            }
+            _ => write!(f, "{}", (self as &error::Error).description())
+        }
     }
 }

@@ -7,19 +7,14 @@
 pub enum Expr {
     /// An atom
     Atom(String),
-
     /// An integer
     Integer(i64),
-
     /// A float
     Float(f64),
-
     /// A string
     Str(String),
-
     /// A bool
     Bool(bool),
-
     /// A list
     List(Vec<Box<Expr>>),
 }

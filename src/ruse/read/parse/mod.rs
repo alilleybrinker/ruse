@@ -41,14 +41,20 @@ impl Parse for Vec<Token> {
         let mut parens = Parens::new();
 
         for token in self {
-            if parens.matching() && token.kind != TokenKind::OpenParen {
+            if parens.matching() && !token.kind.is_open_delim() {
                 return Err(Error::NoEnclosingParens);
             }
 
             match token.kind {
-                TokenKind::OpenParen => parens.count += 1,
-                TokenKind::CloseParen => parens.count -= 1,
-                // TODO: Fill this out with parsing of other things.
+                TokenKind::OpenDelim(..) => parens.count += 1,
+                TokenKind::CloseDelim(..) => parens.count -= 1,
+                TokenKind::Ident(ref s) => {
+                    if parens.matching() {
+                        return Err(Error::UnexpectedIdentifier(s.to_owned()));
+                    }
+
+                    // uhhh
+                }
                 _ => {}
             }
         }

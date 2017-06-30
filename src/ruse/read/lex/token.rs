@@ -4,10 +4,10 @@
 /// and will carry it here.
 #[derive(Debug, PartialEq, Clone)]
 pub enum TokenKind {
-    /// A single open parenthese.
-    OpenParen,
-    /// A single closed parenthese.
-    CloseParen,
+    /// A single open delimiter.
+    OpenDelim(Delim),
+    /// A single close delimiter.
+    CloseDelim(Delim),
     /// An identifier.
     Ident(String),
     /// An integer literal.
@@ -18,6 +18,27 @@ pub enum TokenKind {
     Str(String),
     /// A boolean
     Bool(bool),
+}
+
+impl TokenKind {
+    /// Checks whether the token kind is an open delim.
+    pub fn is_open_delim(&self) -> bool {
+        match *self {
+            TokenKind::OpenDelim(..) => true,
+            _ => false,
+        }
+    }
+}
+
+/// Indicates type of delimiter.
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub enum Delim {
+    /// Parens: ( and )
+    Paren,
+    /// Brackets: [ and ]
+    Bracket,
+    /// Braces: { and }
+    Brace,
 }
 
 /// The location of a token in an input stream.
@@ -49,73 +70,60 @@ pub struct Token {
     pub span: Span,
 }
 
+macro_rules! delim_token {
+    ( $fn_name:ident, $open_or_closed:ident, $variant_name:ident ) => {
+        /// Create a delimiter token.
+        pub fn $fn_name(location: Location) -> Token {
+            Token {
+                kind: TokenKind::$open_or_closed(Delim::$variant_name),
+                location: location,
+                span: Span(1),
+            }
+        }
+    };
+}
+
+macro_rules! stringy_token {
+    ( $fn_name:ident, $variant_name:ident ) => {
+        /// Create a stringy token.
+        pub fn $fn_name<S: Into<String>>(s: S, location: Location) -> Token {
+            let s: String = s.into();
+            let len = s.len();
+
+            Token {
+                kind: TokenKind::$variant_name(s),
+                location: location,
+                span: Span(len),
+            }
+        }
+    };
+}
+
+macro_rules! literal_token {
+    ( $fn_name:ident, $variant_name:ident, $value_type:ty ) => {
+        /// Create a literal token.
+        pub fn $fn_name(value: $value_type, start_location: Location, end_location: Location) -> Token {
+            Token {
+                kind: TokenKind::$variant_name(value),
+                location: start_location,
+                span: start_location.to(end_location),
+            }
+        }
+    };
+}
+
 impl Token {
-    /// Token constructor for open parentheses.
-    pub fn open_paren(location: Location) -> Token {
-        Token {
-            kind: TokenKind::OpenParen,
-            location: location,
-            span: Span(1),
-        }
-    }
+    delim_token!(open_paren, OpenDelim, Paren);
+    delim_token!(close_paren, CloseDelim, Paren);
+    delim_token!(open_bracket, OpenDelim, Bracket);
+    delim_token!(close_bracket, CloseDelim, Bracket);
+    delim_token!(open_brace, OpenDelim, Brace);
+    delim_token!(close_brace, CloseDelim, Brace);
 
-    /// Token constructor for closed parentheses.
-    pub fn close_paren(location: Location) -> Token {
-        Token {
-            kind: TokenKind::CloseParen,
-            location: location,
-            span: Span(1),
-        }
-    }
+    stringy_token!(ident, Ident);
+    stringy_token!(string, Str);
 
-    /// Token constructor for identifiers.
-    pub fn ident<S: Into<String>>(name: S, location: Location) -> Token {
-        let name: String = name.into();
-        let len = name.len();
-
-        Token {
-            kind: TokenKind::Ident(name),
-            location: location,
-            span: Span(len),
-        }
-    }
-
-    /// Token constructor for strings.
-    pub fn string<S: Into<String>>(text: S, location: Location) -> Token {
-        let text: String = text.into();
-        let len = text.len();
-
-        Token {
-            kind: TokenKind::Str(text),
-            location: location,
-            span: Span(len),
-        }
-    }
-
-    /// Token constructor for integers.
-    pub fn integer(value: i64, start_location: Location, end_location: Location) -> Token {
-        Token {
-            kind: TokenKind::Integer(value),
-            location: start_location,
-            span: start_location.to(end_location),
-        }
-    }
-
-    /// Token constructor for floats.
-    pub fn float(value: f64, start_location: Location, end_location: Location) -> Token {
-        Token {
-            kind: TokenKind::Float(value),
-            location: start_location,
-            span: start_location.to(end_location),
-        }
-    }
-
-    /// Token constructor for bools.
-    pub fn boolean(value: bool, start_location: Location, end_location: Location) -> Token {
-        Token {
-            kind: TokenKind::Bool(value),
-            location: start_location,
-            span: start_location.to(end_location),
-        }
-    }
+    literal_token!(integer, Integer, i64);
+    literal_token!(float, Float, f64);
+    literal_token!(boolean, Bool, bool);
 }
