@@ -1,10 +1,7 @@
 language: rust
-rust: nightly
-sudo: false
 cache: cargo
-script:
-    - cd ruse
-    - cargo build --verbose
-    - cargo clean
-    - cargo test --verbose
-    - cargo clean
+sudo: false
+rust:
+    - stable
+    - beta
+    - nightly
