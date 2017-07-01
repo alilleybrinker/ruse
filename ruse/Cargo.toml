@@ -3,11 +3,7 @@ name = "ruse"
 version = "0.1.0"
 authors = ["Andrew Brinker <me@andrewbrinker.com>"]
 
-[[bin]]
-name = "ruse"
-path = "src/ruse.rs"
-doc  = false
-
 [dependencies]
-ruse = { path = "../libruse" }
+clap = "2.25.0"
+libruse = { path = "../libruse" }
 

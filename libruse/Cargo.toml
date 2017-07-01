@@ -1,20 +1,10 @@
 [package]
-name        = "ruse"
+name        = "libruse"
 version     = "0.1.0"
 authors     = ["Andrew Brinker <me@andrewbrinker.com>"]
-description = "An embedded Scheme for Rust, like Lua for C."
-homepage    = "https://github.com/ruse-lang/ruse"
-repository  = "https://github.com/ruse-lang/ruse"
-readme      = "README.md"
-keywords    = ["language", "lisp"]
-license     = "MIT/Apache-2.0"
-
-[lib]
-name = "ruse"
-path = "src/lib.rs"
 
 [dependencies]
-read = { path = "../libruse-read" }
-eval = { path = "../libruse-eval" }
-print = { path = "../libruse-print" }
+libruse-read = { path = "../libruse-read" }
+libruse-eval = { path = "../libruse-eval" }
+libruse-print = { path = "../libruse-print" }
 

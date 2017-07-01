@@ -10,9 +10,9 @@
 //! This is obviously an amibitious project, and I don't know when/if Ruse will
 //! reach this point. But it's sure fun to play with!
 
-extern crate read;
-extern crate eval;
-extern crate print;
+extern crate libruse_read as read;
+extern crate libruse_eval as eval;
+extern crate libruse_print as print;
 
 pub mod error;
 

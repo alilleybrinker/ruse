@@ -1,5 +1,5 @@
 [package]
-name = "print"
+name = "libruse-print"
 version = "0.1.0"
 authors = ["Andrew Brinker <me@andrewbrinker.com>"]
 

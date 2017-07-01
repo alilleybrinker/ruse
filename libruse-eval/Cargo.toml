@@ -1,5 +1,5 @@
 [package]
-name = "eval"
+name = "libruse-eval"
 version = "0.1.0"
 authors = ["Andrew Brinker <me@andrewbrinker.com>"]
 
