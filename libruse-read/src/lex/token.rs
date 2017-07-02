@@ -197,7 +197,11 @@ impl<'a> Iterator for TokenIterator<'a> {
             // lex_atom function.
             match character {
                 '(' => return Some(lex_open_paren(self)),
-                ')' => return Some(lex_close_paren(self)),
+                ')' => return Some(lex_closed_paren(self)),
+                '[' => return Some(lex_open_bracket(self)),
+                ']' => return Some(lex_closed_bracket(self)),
+                '{' => return Some(lex_open_brace(self)),
+                '}' => return Some(lex_closed_brace(self)),
                 '#' => return Some(lex_boolean(self, character)),
                 '0'...'9' => return Some(lex_number(self, character)),
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
@@ -230,8 +234,28 @@ fn lex_open_paren(iter: &TokenIterator) -> Result<Token, Error> {
 }
 
 /// Parse a closed parenthese.
-fn lex_close_paren(iter: &TokenIterator) -> Result<Token, Error> {
+fn lex_closed_paren(iter: &TokenIterator) -> Result<Token, Error> {
     Ok(Token::close_paren(iter.location()))
+}
+
+/// Parse an open bracket.
+fn lex_open_bracket(iter: &TokenIterator) -> Result<Token, Error> {
+    Ok(Token::open_bracket(iter.location()))
+}
+
+/// Parse a close bracket.
+fn lex_closed_bracket(iter: &TokenIterator) -> Result<Token, Error> {
+    Ok(Token::close_bracket(iter.location()))
+}
+
+/// Parse an open brace.
+fn lex_open_brace(iter: &TokenIterator) -> Result<Token, Error> {
+    Ok(Token::open_brace(iter.location()))
+}
+
+/// Parse a close brace.
+fn lex_closed_brace(iter: &TokenIterator) -> Result<Token, Error> {
+    Ok(Token::close_brace(iter.location()))
 }
 
 /// Parse a number, either floating point or integer.
