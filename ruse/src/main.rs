@@ -1,3 +1,7 @@
+//! The Ruse CLI
+
+#![deny(missing_docs)]
+
 extern crate libruse;
 extern crate clap;
 
@@ -5,6 +9,16 @@ use libruse::Engine;
 use clap::{Arg, App};
 
 fn main() {
+    // TODO: Expand the CLI to do more.
+    //
+    // Ideally, the CLI would include the following structure:
+    //
+    // ruse help
+    // ruse version
+    // ruse exec "(+ 2 2)"
+    // ruse exec --file hello.rus
+    // ruse repl
+    // ruse repl --with hello.rus blah.rus
     let matches = App::new("ruse")
         .version(env!("CARGO_PKG_VERSION"))
         .author("Ruse Language Developers")

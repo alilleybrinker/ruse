@@ -37,7 +37,7 @@ impl Parens {
 impl Parse for Vec<Token> {
     /// Parse a vector of tokens into an AST.
     fn parse(&self) -> Result {
-        let ast: Option<_> = None;
+        let ast: Option<Expr> = None;
         let mut parens = Parens::new();
 
         for token in self {

@@ -1,5 +1,7 @@
 //! Read a Ruse program into a data structure which may be evaluated.
 
+#![deny(missing_docs)]
+
 pub mod lex;
 pub mod parse;
 pub mod error;
