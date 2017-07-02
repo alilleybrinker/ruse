@@ -30,8 +30,8 @@ pub fn lex<S: AsRef<str>>(s: S) -> Result {
 #[cfg(test)]
 mod tests {
     use lex::lex;
+    use lex::Error;
     use lex::token::{Token, Location};
-    use lex::error::Error;
 
     #[test]
     fn lex_the_empty_program() {
