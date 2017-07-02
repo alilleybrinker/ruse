@@ -3,8 +3,8 @@
 pub mod error;
 pub mod expr;
 
+pub use parse::error::{Error, Result};
 use lex::token::{Token, TokenKind};
-use parse::error::{Result, Error};
 use parse::expr::Expr;
 
 /// Parse an input string, returning a Ruse expression that can be evaluated.

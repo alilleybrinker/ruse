@@ -3,7 +3,7 @@
 pub mod error;
 pub mod token;
 
-use lex::error::Result;
+pub use lex::error::{Error, Result};
 use lex::token::StrTokenIterator;
 
 /// Lexes an input string to get a vector of tokens from it.

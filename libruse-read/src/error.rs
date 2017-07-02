@@ -14,9 +14,9 @@ pub type Result = result::Result<Expr, Error>;
 #[derive(Debug, PartialEq)]
 pub enum Error {
     /// Indicates an error in lexing.
-    LexError(lex::error::Error),
+    LexError(lex::Error),
     /// Indicates an error in parsing.
-    ParseError(parse::error::Error),
+    ParseError(parse::Error),
 }
 
 impl error::Error for Error {
@@ -47,16 +47,16 @@ impl fmt::Display for Error {
     }
 }
 
-impl From<lex::error::Error> for Error {
+impl From<lex::Error> for Error {
     /// Convert from a lex::Error into a read::Error.
-    fn from(err: lex::error::Error) -> Error {
+    fn from(err: lex::Error) -> Error {
         Error::LexError(err)
     }
 }
 
-impl From<parse::error::Error> for Error {
+impl From<parse::Error> for Error {
     /// Convert from a parse::Error into a read::Error.
-    fn from(err: parse::error::Error) -> Error {
+    fn from(err: parse::Error) -> Error {
         Error::ParseError(err)
     }
 }
