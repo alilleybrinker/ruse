@@ -19,14 +19,15 @@ struct Parens {
 
 impl Parens {
     fn new() -> Self {
-        Parens {
-            count: 0
-        }
+        Parens { count: 0 }
     }
 
     fn matching(&self) -> bool {
-        if self.count != 0 { false }
-        else { true }
+        if self.count != 0 {
+            false
+        } else {
+            true
+        }
     }
 
     fn not_matching(&self) -> bool {

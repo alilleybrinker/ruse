@@ -38,10 +38,8 @@ impl fmt::Display for Error {
     /// More detailed information about the error.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Error::UnexpectedIdentifier(ref s) => {
-                write!(f, "unexpected identifier '{}'", s)
-            }
-            _ => write!(f, "{}", (self as &error::Error).description())
+            Error::UnexpectedIdentifier(ref s) => write!(f, "unexpected identifier '{}'", s),
+            _ => write!(f, "{}", (self as &error::Error).description()),
         }
     }
 }

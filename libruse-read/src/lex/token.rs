@@ -109,7 +109,9 @@ macro_rules! stringy_token {
 macro_rules! literal_token {
     ( $fn_name:ident, $variant_name:ident, $value_type:ty ) => {
         /// Create a literal token.
-        pub fn $fn_name(value: $value_type, start_location: Location, end_location: Location) -> Token {
+        pub fn $fn_name(value: $value_type,
+                        start_location: Location,
+                        end_location: Location) -> Token {
             Token {
                 kind: TokenKind::$variant_name(value),
                 location: start_location,
@@ -120,12 +122,12 @@ macro_rules! literal_token {
 }
 
 impl Token {
-    delim_token!(open_paren,    TokenKind::OpenDelim(Delim::Paren));
-    delim_token!(close_paren,   TokenKind::CloseDelim(Delim::Paren));
-    delim_token!(open_bracket,  TokenKind::OpenDelim(Delim::Bracket));
+    delim_token!(open_paren, TokenKind::OpenDelim(Delim::Paren));
+    delim_token!(close_paren, TokenKind::CloseDelim(Delim::Paren));
+    delim_token!(open_bracket, TokenKind::OpenDelim(Delim::Bracket));
     delim_token!(close_bracket, TokenKind::CloseDelim(Delim::Bracket));
-    delim_token!(open_brace,    TokenKind::OpenDelim(Delim::Brace));
-    delim_token!(close_brace,   TokenKind::CloseDelim(Delim::Brace));
+    delim_token!(open_brace, TokenKind::OpenDelim(Delim::Brace));
+    delim_token!(close_brace, TokenKind::CloseDelim(Delim::Brace));
 
     stringy_token!(ident, Ident);
     stringy_token!(string, Str);

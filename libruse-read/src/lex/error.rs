@@ -41,10 +41,12 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Error::InvalidCharacter(character, location) => {
-                write!(f,
-                       "invalid character '{}' at column {}",
-                       character,
-                       location)
+                write!(
+                    f,
+                    "invalid character '{}' at column {}",
+                    character,
+                    location
+                )
             }
             Error::MalformedNumber(ref number, location) => {
                 write!(f, "malformed number '{}' at column '{}'", number, location)
@@ -53,10 +55,12 @@ impl fmt::Display for Error {
                 write!(f, "invalid literal '{}' at column '{}'", string, location)
             }
             Error::InvalidEscapeSequence(ref string, location) => {
-                write!(f,
-                       "invalid escape sequence '{}' at column '{}'",
-                       string,
-                       location)
+                write!(
+                    f,
+                    "invalid escape sequence '{}' at column '{}'",
+                    string,
+                    location
+                )
             }
         }
     }
