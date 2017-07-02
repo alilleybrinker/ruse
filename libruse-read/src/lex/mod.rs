@@ -29,7 +29,7 @@ pub fn lex<S: AsRef<str>>(s: S) -> Result {
 
 #[cfg(test)]
 mod tests {
-    use lex::Lex;
+    use lex::lex;
     use lex::token::{Token, Location};
     use lex::error::Error;
 
@@ -171,6 +171,20 @@ mod tests {
             Token::string("hello\n", Location(4)),
             Token::integer(4, Location(13), Location(13)),
             Token::close_paren(Location(14)),
+        ]);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn lex_mix_of_delimiters() {
+        let result = lex("([{}])");
+        let expected = Ok(vec![
+            Token::open_paren(Location(1)),
+            Token::open_bracket(Location(2)),
+            Token::open_brace(Location(3)),
+            Token::close_brace(Location(4)),
+            Token::close_bracket(Location(5)),
+            Token::close_paren(Location(6)),
         ]);
         assert_eq!(result, expected);
     }
