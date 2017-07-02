@@ -33,10 +33,7 @@ goes.
 
 ## Contributing
 
-All discussions and contributions will be handled via GitHub Issues and Pull
-Requests. If you have an idea or change you'd like to have made, open an Issue,
-and possibly make a Pull Request. If you have any questions about the process,
-open an Issue asking for clarification.
+See the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## Structure
 
