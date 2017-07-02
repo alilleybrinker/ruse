@@ -7,11 +7,13 @@ pub mod parse;
 pub mod error;
 
 use error::Result;
-use lex::Lex;
-use parse::Parse;
+use lex::lex;
+use parse::parse;
 
 /// Read a string representing a Ruse program into a syntax tree representation
 /// of that program.
-pub fn read<S: AsRef<str>>(s: S) -> Result {
-    Ok(s.lex()?.parse()?)
+pub fn read<S: AsRef<str>>(program: S) -> Result {
+    let tokens = lex(program)?;
+    let ast = parse(&tokens)?;
+    Ok(ast)
 }

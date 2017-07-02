@@ -7,15 +7,9 @@ pub use lex::error::{Error, Result};
 use lex::token::StrTokenIterator;
 
 /// Lexes an input string to get a vector of tokens from it.
-pub trait Lex: AsRef<str> {
-    /// Get a vector of tokens from the given string, or a lex::Error if there's
-    /// something wrong with the input stream.
-    fn lex(&self) -> Result {
-        self.as_ref().tokens().collect::<Result>()
-    }
+pub fn lex<S: AsRef<str>>(s: S) -> Result {
+    s.as_ref().tokens().collect::<Result>()
 }
-
-impl<T: AsRef<str>> Lex for T {}
 
 #[cfg(test)]
 mod tests {
@@ -25,28 +19,28 @@ mod tests {
 
     #[test]
     fn lex_the_empty_program() {
-        let tokens = "".lex();
+        let tokens = lex("");
         let expected = Ok(vec![]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_a_single_open_paren() {
-        let tokens = "(".lex();
+        let tokens = lex("(");
         let expected = Ok(vec![Token::open_paren(Location(1))]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_a_single_close_paren() {
-        let tokens = ")".lex();
+        let tokens = lex(")");
         let expected = Ok(vec![Token::close_paren(Location(1))]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_matching_parens() {
-        let tokens = "()".lex();
+        let tokens = lex("()");
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::close_paren(Location(2)),
@@ -56,7 +50,7 @@ mod tests {
 
     #[test]
     fn lex_a_simple_program() {
-        let tokens = "(+ 2 3)".lex();
+        let tokens = lex("(+ 2 3)");
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::ident("+", Location(2)),
@@ -69,7 +63,7 @@ mod tests {
 
     #[test]
     fn lex_a_more_complex_program() {
-        let tokens = "(+ (add-two 2) 3.2)".lex();
+        let tokens = lex("(+ (add-two 2) 3.2)");
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::ident("+", Location(2)),
@@ -85,7 +79,7 @@ mod tests {
 
     #[test]
     fn lex_a_complex_identifier() {
-        let tokens = "(%a+/d 2 4)".lex();
+        let tokens = lex("(%a+/d 2 4)");
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::ident("%a+/d", Location(2)),
@@ -98,14 +92,14 @@ mod tests {
 
     #[test]
     fn fail_to_lex_a_non_ascii_character() {
-        let result = "(+ (¢ 3) 4)".lex();
+        let result = lex("(+ (¢ 3) 4)");
         let expected = Err(Error::InvalidCharacter('¢', 5));
         assert_eq!(result, expected);
     }
 
     #[test]
     fn lex_a_short_boolean() {
-        let result = "(#t)".lex();
+        let result = lex("(#t)");
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::boolean(true, Location(2), Location(3)),
@@ -116,7 +110,7 @@ mod tests {
 
     #[test]
     fn lex_a_long_boolean() {
-        let result = "(#false)".lex();
+        let result = lex("(#false)");
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::boolean(false, Location(2), Location(7)),
@@ -127,21 +121,21 @@ mod tests {
 
     #[test]
     fn lex_an_invalid_literal() {
-        let result = "(#what)".lex();
+        let result = lex("(#what)");
         let expected = Err(Error::InvalidLiteral("#what".to_string(), 2));
         assert_eq!(result, expected);
     }
 
     #[test]
     fn lex_a_string() {
-        let result = "\"hello\"".lex();
+        let result = lex("\"hello\"");
         let expected = Ok(vec![Token::string("hello".to_string(), Location(1))]);
         assert_eq!(result, expected);
     }
 
     #[test]
     fn lex_a_string_in_a_function() {
-        let result = "(f 2 \"blah\")".lex();
+        let result = lex("(f 2 \"blah\")");
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::ident("f", Location(2)),
@@ -154,7 +148,7 @@ mod tests {
 
     #[test]
     fn lex_a_string_with_an_escape_equence() {
-        let result = "(g \"hello\n\" 4)".lex();
+        let result = lex("(g \"hello\n\" 4)");
         let expected = Ok(vec![
             Token::open_paren(Location(1)),
             Token::ident("g", Location(2)),
