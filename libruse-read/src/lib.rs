@@ -14,6 +14,6 @@ use parse::parse;
 /// of that program.
 pub fn read<S: AsRef<str>>(program: S) -> Result {
     let tokens = lex(program)?;
-    let ast = parse(&tokens)?;
+    let ast = parse(tokens)?;
     Ok(ast)
 }

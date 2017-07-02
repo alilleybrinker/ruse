@@ -30,7 +30,8 @@ impl Parens {
 }
 
 /// Build an AST from a stream of tokens.
-pub fn parse(v: &[Token]) -> Result {
+pub fn parse<V: AsRef<[Token]>>(v: V) -> Result {
+    let v = v.as_ref();
     let ast: Option<Expr> = None;
     let mut parens = Parens::new();
 
