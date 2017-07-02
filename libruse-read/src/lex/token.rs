@@ -317,9 +317,9 @@ fn lex_boolean(iter: &mut TokenIterator, character: char) -> Result<Token, Error
     let end = iter.location();
 
     if out == "#t" || out == "#true" {
-        return Ok(Token::boolean(true, start, end));
+        Ok(Token::boolean(true, start, end))
     } else if out == "#f" || out == "#false" {
-        return Ok(Token::boolean(false, start, end));
+        Ok(Token::boolean(false, start, end))
     } else {
         Err(Error::InvalidLiteral(out, start.0))
     }

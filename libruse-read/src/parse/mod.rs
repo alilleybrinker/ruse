@@ -23,11 +23,7 @@ impl Parens {
     }
 
     fn matching(&self) -> bool {
-        if self.count != 0 {
-            false
-        } else {
-            true
-        }
+        self.count != 0
     }
 
     fn not_matching(&self) -> bool {
