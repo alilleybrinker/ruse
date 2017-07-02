@@ -4,7 +4,7 @@ pub mod error;
 pub mod expr;
 
 pub use parse::error::{Error, Result};
-use lex::token::Token;
+use lex::token::{Token, TokenKind};
 use parse::expr::Expr;
 use std::slice::Iter;
 use std::iter::Peekable;
@@ -23,7 +23,7 @@ type Tokens<'a> = Peekable<Iter<'a, Token>>;
 
 /// Parses a Ruse expression.
 fn parse_expr(v: &mut Tokens) -> Result {
-    if let Ok(a) = parse_atom(v) {
+    if let Ok(a) = parse_ident(v) {
         return Ok(a);
     }
 
@@ -50,14 +50,21 @@ fn parse_expr(v: &mut Tokens) -> Result {
     Err(Error::InvalidProgram)
 }
 
-/// Parses a Ruse atom
-fn parse_atom(_v: &mut Tokens) -> Result {
-    // Check if the next token is an atom. If it is, succeed.
+/// Parses a Ruse ident
+fn parse_ident(v: &mut Tokens) -> Result {
+    // Check if the next token is an ident. If it is, succeed.
     // Otherwise, error out.
     //
     // Make sure to only have the iterator progress if the next
-    // token is actually an atom.
-    unimplemented!()
+    // token is actually an ident.
+
+    if let Some(t) = v.peek() {
+        if let TokenKind::Ident(ref s) = t.kind {
+            return Ok(Expr::Ident(s.clone()));
+        }
+    }
+
+    unreachable!()
 }
 
 /// Parses a Ruse integer

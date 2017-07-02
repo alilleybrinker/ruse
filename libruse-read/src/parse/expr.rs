@@ -5,8 +5,8 @@
 /// integers, and floats.
 #[derive(Debug)]
 pub enum Expr {
-    /// An atom
-    Atom(String),
+    /// An ident
+    Ident(String),
     /// An integer
     Integer(i64),
     /// A float

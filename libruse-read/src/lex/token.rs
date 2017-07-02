@@ -194,7 +194,7 @@ impl<'a> Iterator for TokenIterator<'a> {
 
             // Decide what to attempt to lex based on the first character. Note that the
             // allowable characters for identifiers are fewer here then they are in the
-            // lex_atom function.
+            // lex_ident function.
             match character {
                 '(' => return Some(lex_open_paren(self)),
                 ')' => return Some(lex_closed_paren(self)),
@@ -205,7 +205,7 @@ impl<'a> Iterator for TokenIterator<'a> {
                 '#' => return Some(lex_boolean(self, character)),
                 '0'...'9' => return Some(lex_number(self, character)),
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
-                '>' | '?' | '^' | '_' | '~' | '+' | '-' => return Some(lex_atom(self, character)),
+                '>' | '?' | '^' | '_' | '~' | '+' | '-' => return Some(lex_ident(self, character)),
                 '"' => return Some(lex_string(self, character)),
                 // Skip whitespace.
                 ' ' | '\n' | '\t' | '\r' => (),
@@ -290,15 +290,15 @@ fn lex_number(iter: &mut TokenIterator, character: char) -> Result<Token, Error>
     }
 }
 
-/// Parse an atom.
+/// Parse an ident.
 ///
-/// This parses an atom, starting with the given character, which is
+/// This parses an ident, starting with the given character, which is
 /// passed in for convenience. Note that at the moment the character
 /// matching rules are kept in sync manually between this function and the
 /// original dispatcher, and that they are not exactly the same. There are
 /// certain characters which are acceptible within an identifier that are
 /// not acceptable at the start of one.
-fn lex_atom(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
+fn lex_ident(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
     let mut result = vec![character];
     let start = iter.location();
 
