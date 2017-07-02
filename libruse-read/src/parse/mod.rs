@@ -60,10 +60,12 @@ fn parse_ident(v: &mut Tokens) -> Result {
 
     if let Some(t) = v.peek() {
         if let TokenKind::Ident(ref s) = t.kind {
+            // TODO: Move the iterator.
             return Ok(Expr::Ident(s.clone()));
         }
     }
 
+    // TODO: Handle the error case
     unreachable!()
 }
 
