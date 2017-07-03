@@ -57,56 +57,77 @@ fn parse_ident(v: &mut Tokens) -> Result {
     //
     // Make sure to only have the iterator progress if the next
     // token is actually an ident.
+    let t = v.peek().unwrap();
 
-    if let Some(t) = v.peek() {
-        if let TokenKind::Ident(ref s) = t.kind {
-            // TODO: Move the iterator.
-            return Ok(Expr::Ident(s.clone()));
-        }
+    if let TokenKind::Ident(ref s) = t.kind {
+        Ok(Expr::Ident(s.clone()))
+    } else {
+        Err(Error::InvalidProgram)
     }
-
-    // TODO: Handle the error case
-    unreachable!()
 }
 
 /// Parses a Ruse integer
-fn parse_integer(_v: &mut Tokens) -> Result {
+fn parse_integer(v: &mut Tokens) -> Result {
     // Check if the next token is an integer. If it is, succeed.
     // Otherwise, error out.
     //
     // Make sure to only have the iterator progress if the next
     // token is actually an integer.
-    unimplemented!()
+    let t = v.peek().unwrap();
+
+    if let TokenKind::Integer(i) = t.kind {
+        Ok(Expr::Integer(i))
+    } else {
+        Err(Error::InvalidProgram)
+    }
 }
 
 /// Parses a Ruse float
-fn parse_float(_v: &mut Tokens) -> Result {
+fn parse_float(v: &mut Tokens) -> Result {
     // Check if the next token is a float. If it is, succeed.
     // Otherwise, error out.
     //
     // Make sure to only have the iterator progress if the next
     // token is actually a float.
-    unimplemented!()
+    let t = v.peek().unwrap();
+
+    if let TokenKind::Float(f) = t.kind {
+        Ok(Expr::Float(f))
+    } else {
+        Err(Error::InvalidProgram)
+    }
 }
 
 /// Parses a Ruse string
-fn parse_string(_v: &mut Tokens) -> Result {
+fn parse_string(v: &mut Tokens) -> Result {
     // Check if the next token is a string. If it is, succeed.
     // Otherwise, error out.
     //
     // Make sure to only have the iterator progress if the next
     // token is actually a string.
-    unimplemented!()
+    let t = v.peek().unwrap();
+
+    if let TokenKind::Str(ref s) = t.kind {
+        Ok(Expr::Str(s.clone()))
+    } else {
+        Err(Error::InvalidProgram)
+    }
 }
 
 /// Parses a Ruse bool
-fn parse_bool(_v: &mut Tokens) -> Result {
+fn parse_bool(v: &mut Tokens) -> Result {
     // Check if the next token is a bool. If it is, succeed.
     // Otherwise, error out.
     //
     // Make sure to only have the iterator progress if the next
     // token is actually a bool.
-    unimplemented!()
+    let t = v.peek().unwrap();
+
+    if let TokenKind::Bool(b) = t.kind {
+        Ok(Expr::Bool(b))
+    } else {
+        Err(Error::InvalidProgram)
+    }
 }
 
 /// Parses a Ruse list
