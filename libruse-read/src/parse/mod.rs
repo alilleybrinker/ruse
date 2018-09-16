@@ -143,5 +143,29 @@ mod tests {
         let result = parse_ident(&mut t_iter);
         assert_eq!(Ok(Expr::Ident("g".to_string())), result);
     }
+
+    #[test]
+    fn test_parse_integer() {
+        let tokens = lex("1").unwrap();
+        let mut t_iter = tokens.iter().peekable();
+        let result = parse_integer(&mut t_iter);
+        assert_eq!(Ok(Expr::Integer(1)), result);
+    }
+
+    #[test]
+    fn test_parse_string() {
+        let tokens = lex("\"hello\"").unwrap();
+        let mut t_iter = tokens.iter().peekable();
+        let result = parse_string(&mut t_iter);
+        assert_eq!(Ok(Expr::Str("hello".to_string())), result);
+    }
+
+    #[test]
+    fn test_parse_bool() {
+        let tokens = lex("#t").unwrap();
+        let mut t_iter = tokens.iter().peekable();
+        let result = parse_bool(&mut t_iter);
+        assert_eq!(Ok(Expr::Bool(true)), result);
+    }
 }
 
