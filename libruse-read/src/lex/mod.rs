@@ -1,17 +1,8 @@
-//! Get a vector of tokens from an input string.
-// Note that this module is mostly tests. This is by
-// design. The parts that the user should care about
-// are the lexer interface, the error type, and the
-// result type. Everything else is really an implementation
-// detail.
-
 pub mod error;
 pub mod token;
-
 pub use lex::error::{Error, Result};
 use lex::token::StrTokenIterator;
 
-/// Lexes an input string to get a vector of tokens from it.
 pub fn lex<S: AsRef<str>>(s: S) -> Result {
     // Note that the `collect` call does some magic thanks to
     // a stdlib impl for `Vec`. It actually auto-converts a

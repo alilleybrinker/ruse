@@ -1,18 +1,15 @@
 //! Generate a syntax tree from an input stream.
 
-pub mod env;
 pub mod error;
 pub mod expr;
 
 pub use parse::error::{Response, Result};
-use parse::env::Env;
 use parse::expr::*;
 use lex::token::{Token, TokenKind};
 use parse::expr::Expr;
 use std::slice::Iter;
 use std::iter::Peekable;
 
-/// Build an AST from a stream of tokens.
 pub fn parse<V: AsRef<[Token]>>(v: V) -> Result {
     // TODO: Incorporate environment into parsing.
     let _env = Env::default();
@@ -41,7 +38,6 @@ macro_rules! peek_or_stop {
 // forward in the case of a failed parse.
 type Tokens<'a> = Peekable<Iter<'a, Token>>;
 
-/// Parses a Ruse expression.
 fn parse_expr(v: &mut Tokens) -> Result {
     if let Ok(a) = parse_symbol(v) {
         return Ok(a);
@@ -70,7 +66,6 @@ fn parse_expr(v: &mut Tokens) -> Result {
     Err(Response::InvalidProgram)
 }
 
-/// Parses a Ruse symbol
 fn parse_symbol(v: &mut Tokens) -> Result {
     let t = peek_or_stop!(v);
 
@@ -83,7 +78,6 @@ fn parse_symbol(v: &mut Tokens) -> Result {
     Err(Response::InvalidProgram)
 }
 
-/// Parses a Ruse number
 fn parse_number(v: &mut Tokens) -> Result {
     let t = peek_or_stop!(v);
 
@@ -100,7 +94,6 @@ fn parse_number(v: &mut Tokens) -> Result {
     Err(Response::InvalidProgram)
 }
 
-/// Parses a Ruse float
 fn parse_float(v: &mut Tokens) -> Result {
     let t = peek_or_stop!(v);
 
@@ -117,7 +110,6 @@ fn parse_float(v: &mut Tokens) -> Result {
     Err(Response::InvalidProgram)
 }
 
-/// Parses a Ruse string
 fn parse_string(v: &mut Tokens) -> Result {
     let t = peek_or_stop!(v);
 
@@ -130,7 +122,6 @@ fn parse_string(v: &mut Tokens) -> Result {
     Err(Response::InvalidProgram)
 }
 
-/// Parses a Ruse bool
 fn parse_bool(v: &mut Tokens) -> Result {
     let t = peek_or_stop!(v);
 
@@ -143,7 +134,6 @@ fn parse_bool(v: &mut Tokens) -> Result {
     Err(Response::InvalidProgram)
 }
 
-/// Parses a Ruse list
 fn parse_list(v: &mut Tokens) -> Result {
     // Parse an opening delimiter, then a series of Ruse expressions
     // until you hit the matching closing delimiter. If you hit
