@@ -1,6 +1,6 @@
 //! Lexing error and result types.
 
-use lex::token::Token;
+use lex::token::{Token, Location};
 
 use std::error;
 use std::fmt;
@@ -15,13 +15,13 @@ pub type Result = result::Result<Vec<Token>, Error>;
 #[derive(Debug, PartialEq)]
 pub enum Error {
     /// Character and location
-    InvalidCharacter(char, usize),
+    InvalidCharacter(char, Location),
     /// The almost-number.
-    MalformedNumber(String, usize),
+    MalformedNumber(String, Location),
     /// An almost-literal
-    InvalidLiteral(String, usize),
+    InvalidLiteral(String, Location),
     /// An almost-escape sequence
-    InvalidEscapeSequence(String, usize),
+    InvalidEscapeSequence(String, Location),
 }
 
 impl error::Error for Error {
@@ -43,21 +43,21 @@ impl fmt::Display for Error {
             Error::InvalidCharacter(character, location) => {
                 write!(
                     f,
-                    "invalid character '{}' at column {}",
+                    "invalid character '{}' at {}",
                     character,
                     location
                 )
             }
             Error::MalformedNumber(ref number, location) => {
-                write!(f, "malformed number '{}' at column '{}'", number, location)
+                write!(f, "malformed number '{}' at '{}'", number, location)
             }
             Error::InvalidLiteral(ref string, location) => {
-                write!(f, "invalid literal '{}' at column '{}'", string, location)
+                write!(f, "invalid literal '{}' at '{}'", string, location)
             }
             Error::InvalidEscapeSequence(ref string, location) => {
                 write!(
                     f,
-                    "invalid escape sequence '{}' at column '{}'",
+                    "invalid escape sequence '{}' at '{}'",
                     string,
                     location
                 )

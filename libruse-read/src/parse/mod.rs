@@ -1,9 +1,12 @@
 //! Generate a syntax tree from an input stream.
 
+pub mod env;
 pub mod error;
 pub mod expr;
 
 pub use parse::error::{Response, Result};
+use parse::env::Env;
+use parse::expr::*;
 use lex::token::{Token, TokenKind};
 use parse::expr::Expr;
 use std::slice::Iter;
@@ -11,6 +14,8 @@ use std::iter::Peekable;
 
 /// Build an AST from a stream of tokens.
 pub fn parse<V: AsRef<[Token]>>(v: V) -> Result {
+    // TODO: Incorporate environment into parsing.
+    let _env = Env::default();
     let mut i = v.as_ref().iter().peekable();
     parse_expr(&mut i)
 }
@@ -38,52 +43,58 @@ type Tokens<'a> = Peekable<Iter<'a, Token>>;
 
 /// Parses a Ruse expression.
 fn parse_expr(v: &mut Tokens) -> Result {
-    while let Some(_) = v.peek() {
-        if let Ok(a) = parse_ident(v) {
-            return Ok(a);
-        }
+    if let Ok(a) = parse_symbol(v) {
+        return Ok(a);
+    }
 
-        if let Ok(a) = parse_integer(v) {
-            return Ok(a);
-        }
+    if let Ok(a) = parse_number(v) {
+        return Ok(a);
+    }
 
-        if let Ok(a) = parse_float(v) {
-            return Ok(a);
-        }
+    if let Ok(a) = parse_float(v) {
+        return Ok(a);
+    }
 
-        if let Ok(a) = parse_string(v) {
-            return Ok(a);
-        }
+    if let Ok(a) = parse_string(v) {
+        return Ok(a);
+    }
 
-        if let Ok(a) = parse_bool(v) {
-            return Ok(a);
-        }
+    if let Ok(a) = parse_bool(v) {
+        return Ok(a);
+    }
 
-        if let Ok(a) = parse_list(v) {
-            return Ok(a);
-        }
+    if let Ok(a) = parse_list(v) {
+        return Ok(a);
     }
 
     Err(Response::InvalidProgram)
 }
 
-/// Parses a Ruse ident
-fn parse_ident(v: &mut Tokens) -> Result {
+/// Parses a Ruse symbol
+fn parse_symbol(v: &mut Tokens) -> Result {
     let t = peek_or_stop!(v);
 
     if let TokenKind::Ident(ref s) = t.kind {
-        return Ok(Expr::Ident(s.clone()));
+        let kind = ExprKind::Symbol(s.clone());
+        let expr = Expr::new(kind);
+        return Ok(expr);
     }
 
     Err(Response::InvalidProgram)
 }
 
-/// Parses a Ruse integer
-fn parse_integer(v: &mut Tokens) -> Result {
+/// Parses a Ruse number
+fn parse_number(v: &mut Tokens) -> Result {
     let t = peek_or_stop!(v);
 
     if let TokenKind::Integer(i) = t.kind {
-        return Ok(Expr::Integer(i));
+        let value = Number {
+            kind: NumberKind::Int(i),
+            exact: true,
+        };
+        let kind = ExprKind::Num(value);
+        let expr = Expr::new(kind);
+        return Ok(expr);
     }
 
     Err(Response::InvalidProgram)
@@ -94,7 +105,13 @@ fn parse_float(v: &mut Tokens) -> Result {
     let t = peek_or_stop!(v);
 
     if let TokenKind::Float(f) = t.kind {
-        return Ok(Expr::Float(f));
+        let value = Number {
+            kind: NumberKind::Real(f),
+            exact: true,
+        };
+        let kind = ExprKind::Num(value);
+        let expr = Expr::new(kind);
+        return Ok(expr);
     }
 
     Err(Response::InvalidProgram)
@@ -105,7 +122,9 @@ fn parse_string(v: &mut Tokens) -> Result {
     let t = peek_or_stop!(v);
 
     if let TokenKind::Str(ref s) = t.kind {
-        return Ok(Expr::Str(s.clone()));
+        let kind = ExprKind::Str(s.clone());
+        let expr = Expr::new(kind);
+        return Ok(expr);
     }
 
     Err(Response::InvalidProgram)
@@ -116,17 +135,25 @@ fn parse_bool(v: &mut Tokens) -> Result {
     let t = peek_or_stop!(v);
 
     if let TokenKind::Bool(b) = t.kind {
-        return Ok(Expr::Bool(b));
+        let kind = ExprKind::Bool(b);
+        let expr = Expr::new(kind);
+        return Ok(expr);
     }
 
     Err(Response::InvalidProgram)
 }
 
 /// Parses a Ruse list
-fn parse_list(_v: &mut Tokens) -> Result {
+fn parse_list(v: &mut Tokens) -> Result {
     // Parse an opening delimiter, then a series of Ruse expressions
     // until you hit the matching closing delimiter. If you hit
     // a non-matching closing delimiter first, error out.
+    let t = peek_or_stop!(v);
+
+    if !t.kind.is_open_delim() {
+        return Err(Response::InvalidProgram);
+    }
+
     unimplemented!()
 }
 
@@ -137,34 +164,34 @@ mod tests {
     use lex::*;
 
     #[test]
-    fn test_parse_ident() {
+    fn test_parse_symbol() {
         let tokens = lex("g").unwrap();
         let mut t_iter = tokens.iter().peekable();
-        let result = parse_ident(&mut t_iter);
+        let result = parse_symbol(&mut t_iter);
         assert_eq!(Ok(Expr::Ident("g".to_string())), result);
     }
 
     #[test]
-    fn test_parse_long_ident() {
+    fn test_parse_long_symbol() {
         let tokens = lex("galwprhwg").unwrap();
         let mut t_iter = tokens.iter().peekable();
-        let result = parse_ident(&mut t_iter);
+        let result = parse_symbol(&mut t_iter);
         assert_eq!(Ok(Expr::Ident("galwprhwg".to_string())), result);
     }
 
     #[test]
-    fn test_parse_integer() {
+    fn test_parse_number() {
         let tokens = lex("1").unwrap();
         let mut t_iter = tokens.iter().peekable();
-        let result = parse_integer(&mut t_iter);
+        let result = parse_number(&mut t_iter);
         assert_eq!(Ok(Expr::Integer(1)), result);
     }
 
     #[test]
-    fn test_parse_long_integer() {
+    fn test_parse_long_number() {
         let tokens = lex("1455647").unwrap();
         let mut t_iter = tokens.iter().peekable();
-        let result = parse_integer(&mut t_iter);
+        let result = parse_number(&mut t_iter);
         assert_eq!(Ok(Expr::Integer(1455647)), result);
     }
 
