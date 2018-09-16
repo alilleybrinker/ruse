@@ -145,11 +145,27 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_long_ident() {
+        let tokens = lex("galwprhwg").unwrap();
+        let mut t_iter = tokens.iter().peekable();
+        let result = parse_ident(&mut t_iter);
+        assert_eq!(Ok(Expr::Ident("galwprhwg".to_string())), result);
+    }
+
+    #[test]
     fn test_parse_integer() {
         let tokens = lex("1").unwrap();
         let mut t_iter = tokens.iter().peekable();
         let result = parse_integer(&mut t_iter);
         assert_eq!(Ok(Expr::Integer(1)), result);
+    }
+
+    #[test]
+    fn test_parse_long_integer() {
+        let tokens = lex("1455647").unwrap();
+        let mut t_iter = tokens.iter().peekable();
+        let result = parse_integer(&mut t_iter);
+        assert_eq!(Ok(Expr::Integer(1455647)), result);
     }
 
     #[test]
@@ -161,11 +177,19 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_bool() {
+    fn test_parse_bool_true() {
         let tokens = lex("#t").unwrap();
         let mut t_iter = tokens.iter().peekable();
         let result = parse_bool(&mut t_iter);
         assert_eq!(Ok(Expr::Bool(true)), result);
+    }
+
+    #[test]
+    fn test_parse_bool_false() {
+        let tokens = lex("#f").unwrap();
+        let mut t_iter = tokens.iter().peekable();
+        let result = parse_bool(&mut t_iter);
+        assert_eq!(Ok(Expr::Bool(false)), result);
     }
 }
 
