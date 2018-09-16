@@ -3,7 +3,7 @@
 
 /// A Ruse value, which at the moment consists only of lists, strings,
 /// integers, and floats.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Expr {
     /// An ident
     Ident(String),

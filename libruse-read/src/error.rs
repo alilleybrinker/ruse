@@ -16,7 +16,7 @@ pub enum Error {
     /// Indicates an error in lexing.
     LexError(lex::Error),
     /// Indicates an error in parsing.
-    ParseError(parse::Error),
+    ParseError(parse::Response),
 }
 
 impl error::Error for Error {
@@ -54,9 +54,9 @@ impl From<lex::Error> for Error {
     }
 }
 
-impl From<parse::Error> for Error {
-    /// Convert from a parse::Error into a read::Error.
-    fn from(err: parse::Error) -> Error {
+impl From<parse::Response> for Error {
+    /// Convert from a parse::Response into a read::Error.
+    fn from(err: parse::Response) -> Error {
         Error::ParseError(err)
     }
 }
