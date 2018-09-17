@@ -102,7 +102,7 @@ impl Location {
 
     pub fn next_line(&mut self) {
         self.line += 1;
-        self.column = 0;
+        self.column = 1;
     }
 }
 
@@ -250,11 +250,13 @@ impl<'a> TokenIterator<'a> {
 
     fn step(&mut self, end_of_line: EndOfLine, m: Move) {
         let mut location = self.get_location();
+
         if end_of_line.into() && !self.string_context {
             location.next_line();
         } else {
             location.next_column();
         }
+
         self.set_location(location);
 
         if m.into() {
@@ -296,7 +298,7 @@ impl<'a> Iterator for TokenIterator<'a> {
                 // Skip whitespace.
                 ' ' | '\t' | '\r' => self.step(EndOfLine::No, Move::No),
                 // Count newlines
-                '\n' => self.step(EndOfLine::Yes, Move::Yes),
+                '\n' => self.step(EndOfLine::Yes, Move::No),
                 _ => return Some(Err(Error::InvalidCharacter(character, self.get_location()))),
             }
         }

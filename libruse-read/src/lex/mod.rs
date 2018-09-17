@@ -218,9 +218,30 @@ mod tests {
 
             Token::open_paren(Location::new(2, 1), Location::new(2, 2)),
             Token::symbol("+", Location::new(2, 2)),
-            Token::integer(1, Location::new(2, 4), Location::new(2, 5)),
-            Token::integer(2, Location::new(2, 6), Location::new(2, 7)),
+            Token::integer(3, Location::new(2, 4), Location::new(2, 5)),
+            Token::integer(4, Location::new(2, 6), Location::new(2, 7)),
             Token::close_paren(Location::new(2, 7), Location::new(2, 8))
+        ]);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn lex_indented_multiline_program() {
+        let program = "(+ 1 2)
+                       (+ 3 4)";
+        let result = lex(program);
+        let expected = Ok(vec![
+            Token::open_paren(Location::new(1, 1), Location::new(1, 2)),
+            Token::symbol("+", Location::new(1, 2)),
+            Token::integer(1, Location::new(1, 4), Location::new(1, 5)),
+            Token::integer(2, Location::new(1, 6), Location::new(1, 7)),
+            Token::close_paren(Location::new(1, 7), Location::new(1,8)),
+
+            Token::open_paren(Location::new(2, 24), Location::new(2, 25)),
+            Token::symbol("+", Location::new(2, 25)),
+            Token::integer(3, Location::new(2, 27), Location::new(2, 28)),
+            Token::integer(4, Location::new(2, 29), Location::new(2, 30)),
+            Token::close_paren(Location::new(2, 30), Location::new(2, 31))
         ]);
         assert_eq!(result, expected);
     }
