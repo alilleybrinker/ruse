@@ -1,3 +1,5 @@
+#![feature(cell_update)]
+
 pub mod lex;
 pub mod parse;
 pub mod error;

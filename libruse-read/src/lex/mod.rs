@@ -34,14 +34,30 @@ mod tests {
     #[test]
     fn lex_a_single_open_paren() {
         let tokens = lex("(");
-        let expected = Ok(vec![Token::open_paren(Location(1))]);
+        let expected =
+            Ok(
+                vec![
+                    Token::open_paren(
+                        Location::new(1, 1),
+                        Location::new(1, 2)
+                    )
+                ]
+            );
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn lex_a_single_close_paren() {
         let tokens = lex(")");
-        let expected = Ok(vec![Token::close_paren(Location(1))]);
+        let expected =
+            Ok(
+                vec![
+                    Token::close_paren(
+                        Location::new(1, 1),
+                        Location::new(1, 2)
+                    )
+                ]
+            );
         assert_eq!(tokens, expected);
     }
 
@@ -49,8 +65,8 @@ mod tests {
     fn lex_matching_parens() {
         let tokens = lex("()");
         let expected = Ok(vec![
-            Token::open_paren(Location(1)),
-            Token::close_paren(Location(2)),
+            Token::open_paren(Location::new(1, 1), Location::new(1, 2)),
+            Token::close_paren(Location::new(1, 2), Location::new(1, 3)),
         ]);
         assert_eq!(tokens, expected);
     }
@@ -59,11 +75,11 @@ mod tests {
     fn lex_a_simple_program() {
         let tokens = lex("(+ 2 3)");
         let expected = Ok(vec![
-            Token::open_paren(Location(1)),
-            Token::ident("+", Location(2)),
-            Token::integer(2, Location(4), Location(4)),
-            Token::integer(3, Location(6), Location(6)),
-            Token::close_paren(Location(7)),
+            Token::open_paren(Location::new(1, 1), Location::new(1, 2)),
+            Token::symbol("+", Location::new(1, 2)),
+            Token::integer(2, Location::new(1, 4), Location::new(1, 5)),
+            Token::integer(3, Location::new(1, 6), Location::new(1, 7)),
+            Token::close_paren(Location::new(1, 7), Location::new(1, 8)),
         ]);
         assert_eq!(tokens, expected);
     }
@@ -72,27 +88,27 @@ mod tests {
     fn lex_a_more_complex_program() {
         let tokens = lex("(+ (add-two 2) 3.2)");
         let expected = Ok(vec![
-            Token::open_paren(Location(1)),
-            Token::ident("+", Location(2)),
-            Token::open_paren(Location(4)),
-            Token::ident("add-two", Location(5)),
-            Token::integer(2, Location(13), Location(13)),
-            Token::close_paren(Location(14)),
-            Token::float(3.2, Location(16), Location(18)),
-            Token::close_paren(Location(19)),
+            Token::open_paren(Location::new(1, 1), Location::new(1, 2)),
+            Token::symbol("+", Location::new(1, 2)),
+            Token::open_paren(Location::new(1, 4), Location::new(1, 5)),
+            Token::symbol("add-two", Location::new(1, 5)),
+            Token::integer(2, Location::new(1, 13), Location::new(1, 14)),
+            Token::close_paren(Location::new(1, 14), Location::new(1, 15)),
+            Token::float(3.2, Location::new(1, 16), Location::new(1, 19)),
+            Token::close_paren(Location::new(1, 19), Location::new(1, 20)),
         ]);
         assert_eq!(tokens, expected);
     }
 
     #[test]
-    fn lex_a_complex_identifier() {
+    fn lex_a_complex_symbol() {
         let tokens = lex("(%a+/d 2 4)");
         let expected = Ok(vec![
-            Token::open_paren(Location(1)),
-            Token::ident("%a+/d", Location(2)),
-            Token::integer(2, Location(8), Location(8)),
-            Token::integer(4, Location(10), Location(10)),
-            Token::close_paren(Location(11)),
+            Token::open_paren(Location::new(1, 1), Location::new(1, 2)),
+            Token::symbol("%a+/d", Location::new(1, 2)),
+            Token::integer(2, Location::new(1, 8), Location::new(1, 9)),
+            Token::integer(4, Location::new(1, 10), Location::new(1, 11)),
+            Token::close_paren(Location::new(1, 11), Location::new(1, 12)),
         ]);
         assert_eq!(tokens, expected);
     }
@@ -100,7 +116,7 @@ mod tests {
     #[test]
     fn fail_to_lex_a_non_ascii_character() {
         let result = lex("(+ (¢ 3) 4)");
-        let expected = Err(Error::InvalidCharacter('¢', 5));
+        let expected = Err(Error::InvalidCharacter('¢', Location::new(1, 5)));
         assert_eq!(result, expected);
     }
 
@@ -108,9 +124,9 @@ mod tests {
     fn lex_a_short_boolean() {
         let result = lex("(#t)");
         let expected = Ok(vec![
-            Token::open_paren(Location(1)),
-            Token::boolean(true, Location(2), Location(3)),
-            Token::close_paren(Location(4)),
+            Token::open_paren(Location::new(1, 1), Location::new(1, 2)),
+            Token::boolean(true, Location::new(1, 2), Location::new(1, 4)),
+            Token::close_paren(Location::new(1, 4), Location::new(1, 5)),
         ]);
         assert_eq!(result, expected);
     }
@@ -119,9 +135,9 @@ mod tests {
     fn lex_a_long_boolean() {
         let result = lex("(#false)");
         let expected = Ok(vec![
-            Token::open_paren(Location(1)),
-            Token::boolean(false, Location(2), Location(7)),
-            Token::close_paren(Location(8)),
+            Token::open_paren(Location::new(1, 1), Location::new(1, 2)),
+            Token::boolean(false, Location::new(1, 2), Location::new(1, 8)),
+            Token::close_paren(Location::new(1, 8), Location::new(1, 9)),
         ]);
         assert_eq!(result, expected);
     }
@@ -129,14 +145,22 @@ mod tests {
     #[test]
     fn lex_an_invalid_literal() {
         let result = lex("(#what)");
-        let expected = Err(Error::InvalidLiteral("#what".to_string(), 2));
+        let expected = Err(Error::InvalidLiteral("#what".to_string(), Location::new(1, 2)));
         assert_eq!(result, expected);
     }
 
     #[test]
     fn lex_a_string() {
         let result = lex("\"hello\"");
-        let expected = Ok(vec![Token::string("hello".to_string(), Location(1))]);
+        let expected =
+            Ok(
+                vec![
+                    Token::string(
+                        "hello".to_string(),
+                        Location::new(1, 1)
+                    )
+                ]
+            );
         assert_eq!(result, expected);
     }
 
@@ -144,11 +168,11 @@ mod tests {
     fn lex_a_string_in_a_function() {
         let result = lex("(f 2 \"blah\")");
         let expected = Ok(vec![
-            Token::open_paren(Location(1)),
-            Token::ident("f", Location(2)),
-            Token::integer(2, Location(4), Location(4)),
-            Token::string("blah", Location(6)),
-            Token::close_paren(Location(12)),
+            Token::open_paren(Location::new(1, 1), Location::new(1, 2)),
+            Token::symbol("f", Location::new(1, 2)),
+            Token::integer(2, Location::new(1, 4), Location::new(1, 5)),
+            Token::string("blah", Location::new(1, 6)),
+            Token::close_paren(Location::new(1, 12), Location::new(1, 13)),
         ]);
         assert_eq!(result, expected);
     }
@@ -157,11 +181,11 @@ mod tests {
     fn lex_a_string_with_an_escape_equence() {
         let result = lex("(g \"hello\n\" 4)");
         let expected = Ok(vec![
-            Token::open_paren(Location(1)),
-            Token::ident("g", Location(2)),
-            Token::string("hello\n", Location(4)),
-            Token::integer(4, Location(13), Location(13)),
-            Token::close_paren(Location(14)),
+            Token::open_paren(Location::new(1, 1), Location::new(1, 2)),
+            Token::symbol("g", Location::new(1, 2)),
+            Token::string("hello\n", Location::new(1, 4)),
+            Token::integer(4, Location::new(1, 13), Location::new(1, 14)),
+            Token::close_paren(Location::new(1, 14), Location::new(1, 15)),
         ]);
         assert_eq!(result, expected);
     }
@@ -170,13 +194,35 @@ mod tests {
     fn lex_mix_of_delimiters() {
         let result = lex("([{}])");
         let expected = Ok(vec![
-            Token::open_paren(Location(1)),
-            Token::open_bracket(Location(2)),
-            Token::open_brace(Location(3)),
-            Token::close_brace(Location(4)),
-            Token::close_bracket(Location(5)),
-            Token::close_paren(Location(6)),
+            Token::open_paren(Location::new(1, 1), Location::new(1, 2)),
+            Token::open_bracket(Location::new(1, 2), Location::new(1, 3)),
+            Token::open_brace(Location::new(1, 3), Location::new(1, 4)),
+            Token::close_brace(Location::new(1, 4), Location::new(1, 5)),
+            Token::close_bracket(Location::new(1, 5), Location::new(1, 6)),
+            Token::close_paren(Location::new(1, 6), Location::new(1, 7)),
+        ]);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn lex_multiline_program() {
+        let program = "(+ 1 2)
+(+ 3 4)";
+        let result = lex(program);
+        let expected = Ok(vec![
+            Token::open_paren(Location::new(1, 1), Location::new(1, 2)),
+            Token::symbol("+", Location::new(1, 2)),
+            Token::integer(1, Location::new(1, 4), Location::new(1, 5)),
+            Token::integer(2, Location::new(1, 6), Location::new(1, 7)),
+            Token::close_paren(Location::new(1, 7), Location::new(1,8)),
+
+            Token::open_paren(Location::new(2, 1), Location::new(2, 2)),
+            Token::symbol("+", Location::new(2, 2)),
+            Token::integer(1, Location::new(2, 4), Location::new(2, 5)),
+            Token::integer(2, Location::new(2, 6), Location::new(2, 7)),
+            Token::close_paren(Location::new(2, 7), Location::new(2, 8))
         ]);
         assert_eq!(result, expected);
     }
 }
+

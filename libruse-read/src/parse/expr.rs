@@ -33,6 +33,7 @@ pub enum ExprKind {
     Env(Env),
 }
 
+#[allow(dead_code)]
 pub struct Env {
     symbols: HashMap<String, Expr>,
 }

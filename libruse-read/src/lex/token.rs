@@ -4,18 +4,69 @@ use std::iter::Peekable;
 use std::str::Chars;
 use std::iter::Iterator;
 use std::fmt;
+use std::convert::Into;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(PartialEq, Clone)]
 pub enum TokenKind {
     OpenDelim(Delim),
     CloseDelim(Delim),
-    Ident(String),
+    Symbol(String),
     Integer(i64),
     Float(f64),
     Str(String),
     Bool(bool),
+    // TODO: Implement line comments
+    LineComment(String),
     // TODO: Implement block comments
     BlockComment(String),
+    // TODO: Implement datum comments
+    DatumComment(String),
+    // TODO: Implement quotes
+    Quote(String),
+}
+
+impl fmt::Debug for TokenKind {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            TokenKind::OpenDelim(d) => {
+                match d {
+                    Delim::Paren   => write!(f, "'('"),
+                    Delim::Bracket => write!(f, "'['"),
+                    Delim::Brace   => write!(f, "'{{'"),
+                }
+            }
+            TokenKind::CloseDelim(d) => {
+                match d {
+                    Delim::Paren   => write!(f, "')'"),
+                    Delim::Bracket => write!(f, "']'"),
+                    Delim::Brace   => write!(f, "'}}'"),
+                }
+            }
+            TokenKind::Symbol(s) => {
+                write!(f, "'{}'", s.clone())
+            }
+            TokenKind::Integer(i) => {
+                write!(f, "'{}'", *i)
+            }
+            TokenKind::Float(fl) => {
+                write!(f, "'{}'", fl)
+            }
+            TokenKind::Str(s) => {
+                write!(f, "\"{}\"", s.clone())
+            }
+            TokenKind::Bool(b) => {
+                if *b {
+                    write!(f, "#t")
+                } else {
+                    write!(f, "#f")
+                }
+            }
+            TokenKind::LineComment(..) |
+                TokenKind::BlockComment(..) |
+                TokenKind::DatumComment(..) |
+                TokenKind::Quote(..) => write!(f, "")
+        }
+    }
 }
 
 impl TokenKind {
@@ -34,18 +85,39 @@ pub enum Delim {
     Brace,
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy)]
 pub struct Location {
-    column: usize,
     line: usize,
+    column: usize,
+}
+
+impl Location {
+    pub fn new(line: usize, column: usize) -> Location {
+        Location { line, column }
+    }
+
+    pub fn next_column(&mut self) {
+        self.column += 1;
+    }
+
+    pub fn next_line(&mut self) {
+        self.line += 1;
+        self.column = 0;
+    }
 }
 
 impl Default for Location {
     fn default() -> Location {
         Location {
-            line: 0,
-            column: 0,
+            line: 1,
+            column: 1,
         }
+    }
+}
+
+impl fmt::Debug for Location {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}:{}", self.line, self.column)
     }
 }
 
@@ -55,11 +127,17 @@ impl fmt::Display for Location {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 pub struct Token {
     pub kind: TokenKind,
     pub start_location: Location,
     pub end_location: Location,
+}
+
+impl fmt::Debug for Token {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "<k:{:?}, s:{:?}, e:{:?}>", self.kind, self.start_location, self.end_location)
+    }
 }
 
 macro_rules! delim_token {
@@ -115,7 +193,7 @@ impl Token {
     delim_token!(open_brace, TokenKind::OpenDelim(Delim::Brace));
     delim_token!(close_brace, TokenKind::CloseDelim(Delim::Brace));
 
-    stringy_token!(ident, Ident);
+    stringy_token!(symbol, Symbol);
     stringy_token!(string, Str);
 
     literal_token!(integer, Integer, i64);
@@ -126,11 +204,31 @@ impl Token {
 pub struct TokenIterator<'a> {
     char_iter: Peekable<Chars<'a>>,
     location: Cell<Location>,
+    pub string_context: bool,
 }
 
-enum IterateInternally {
-    Yes,
-    No,
+#[derive(Debug, PartialEq, Eq)]
+enum EndOfLine { Yes, No }
+
+impl Into<bool> for EndOfLine {
+    fn into(self) -> bool {
+        match self {
+            EndOfLine::Yes => true,
+            EndOfLine::No => false,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum Move { Yes, No }
+
+impl Into<bool> for Move {
+    fn into(self) -> bool {
+        match self {
+            Move::Yes => true,
+            Move::No => false,
+        }
+    }
 }
 
 impl<'a> TokenIterator<'a> {
@@ -138,26 +236,30 @@ impl<'a> TokenIterator<'a> {
         TokenIterator {
             char_iter: s.chars().peekable(),
             location: Cell::new(Location::default()),
+            string_context: false,
         }
     }
 
-    fn next_location(&mut self, go_to_next: IterateInternally) {
-        if self.char_iter.peek().filter(|v| **v == '\n').is_some() {
-            let new_location = Location {
-                column: 0,
-                line: self.location().line + 1,
-            };
+    fn get_location(&self) -> Location {
+        self.location.get()
+    }
 
-            self.location.set(new_location);
+    fn set_location(&mut self, location: Location) {
+        self.location.set(location);
+    }
+
+    fn step(&mut self, end_of_line: EndOfLine, m: Move) {
+        let mut location = self.get_location();
+        if end_of_line.into() && !self.string_context {
+            location.next_line();
+        } else {
+            location.next_column();
         }
+        self.set_location(location);
 
-        if let IterateInternally::Yes = go_to_next {
+        if m.into() {
             self.char_iter.next();
         }
-    }
-
-    fn location(&self) -> Location {
-        self.location.get()
     }
 }
 
@@ -175,11 +277,10 @@ impl<'a> Iterator for TokenIterator<'a> {
     /// tokens are returned to the user.
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(character) = self.char_iter.next() {
-            self.next_location(IterateInternally::No);
 
             // Decide what to attempt to lex based on the first character. Note that the
-            // allowable characters for identifiers are fewer here then they are in the
-            // lex_ident function.
+            // allowable characters for symbols are fewer here then they are in the
+            // lex_symbol function.
             match character {
                 '(' => return Some(lex_open_paren(self)),
                 ')' => return Some(lex_closed_paren(self)),
@@ -190,11 +291,13 @@ impl<'a> Iterator for TokenIterator<'a> {
                 '#' => return Some(lex_boolean(self, character)),
                 '0'...'9' => return Some(lex_number(self, character)),
                 'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' |
-                    '>' | '?' | '^' | '_' | '~' | '+' | '-' => return Some(lex_ident(self, character)),
+                    '>' | '?' | '^' | '_' | '~' | '+' | '-' => return Some(lex_symbol(self, character)),
                 '"' => return Some(lex_string(self, character)),
                 // Skip whitespace.
-                ' ' | '\n' | '\t' | '\r' => (),
-                _ => return Some(Err(Error::InvalidCharacter(character, self.location()))),
+                ' ' | '\t' | '\r' => self.step(EndOfLine::No, Move::No),
+                // Count newlines
+                '\n' => self.step(EndOfLine::Yes, Move::Yes),
+                _ => return Some(Err(Error::InvalidCharacter(character, self.get_location()))),
             }
         }
 
@@ -213,13 +316,14 @@ impl<T: AsRef<str>> StrTokenIterator for T {}
 
 macro_rules! lex_delim {
     ($name:ident, $e:ident, $span:expr) => {
-        fn $name(iter: &TokenIterator) -> Result<Token, Error> {
-            let start_location = iter.location();
+        fn $name(iter: &mut TokenIterator) -> Result<Token, Error> {
+            let start_location = iter.get_location();
             let end_location = Location {
                 column: start_location.column + $span,
                 line: start_location.line,
             };
 
+            iter.step(EndOfLine::No, Move::No);
             Ok(Token::$e(start_location, end_location))
         }
     }
@@ -234,20 +338,22 @@ lex_delim!(lex_closed_brace, close_brace, 1);
 
 fn lex_number(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
     let mut result = vec![character];
-    let start = iter.location();
+    let start = iter.get_location();
 
     while let Some(&next_character) = iter.char_iter.peek() {
         match next_character {
             '0'...'9' | '.' => {
-                iter.next_location(IterateInternally::Yes);
+                iter.step(EndOfLine::No, Move::Yes);
                 result.push(next_character);
             }
             _ => break,
         }
     }
 
+    iter.step(EndOfLine::No, Move::No);
+
     let out: String = result.iter().cloned().collect();
-    let end = iter.location();
+    let end = iter.get_location();
 
     if let Ok(val) = out.parse::<i64>() {
         Ok(Token::integer(val, start, end))
@@ -258,15 +364,15 @@ fn lex_number(iter: &mut TokenIterator, character: char) -> Result<Token, Error>
     }
 }
 
-fn lex_ident(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
+fn lex_symbol(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
     let mut result = vec![character];
-    let start = iter.location();
+    let start = iter.get_location();
 
     while let Some(&next_character) = iter.char_iter.peek() {
         match next_character {
             'a'...'z' | 'A'...'Z' | '!' | '$' | '%' | '&' | '*' | '/' | ':' | '<' | '=' | '>' |
                 '?' | '^' | '_' | '~' | '0'...'9' | '+' | '-' | '.' | '@' => {
-                    iter.next_location(IterateInternally::Yes);
+                    iter.step(EndOfLine::No, Move::Yes);
                     result.push(next_character);
                 }
             // Stop on whitespace or parentheses.
@@ -275,19 +381,21 @@ fn lex_ident(iter: &mut TokenIterator, character: char) -> Result<Token, Error> 
         }
     }
 
+    iter.step(EndOfLine::No, Move::No);
+
     let out: String = result.iter().cloned().collect();
 
-    Ok(Token::ident(out, start))
+    Ok(Token::symbol(out, start))
 }
 
 fn lex_boolean(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
     let mut result = vec![character];
-    let start = iter.location();
+    let start = iter.get_location();
 
     while let Some(&next_character) = iter.char_iter.peek() {
         match next_character {
             'a'...'z' | 'A'...'Z' => {
-                iter.next_location(IterateInternally::Yes);
+                iter.step(EndOfLine::No, Move::Yes);
                 result.push(next_character);
             }
             // Stop on whitespace or parentheses.
@@ -296,8 +404,10 @@ fn lex_boolean(iter: &mut TokenIterator, character: char) -> Result<Token, Error
         }
     }
 
+    iter.step(EndOfLine::No, Move::No);
+
     let out: String = result.iter().cloned().collect();
-    let end = iter.location();
+    let end = iter.get_location();
 
     if out == "#t" || out == "#true" {
         Ok(Token::boolean(true, start, end))
@@ -311,7 +421,9 @@ fn lex_boolean(iter: &mut TokenIterator, character: char) -> Result<Token, Error
 fn lex_string(iter: &mut TokenIterator, character: char) -> Result<Token, Error> {
     let mut result = Vec::new();
     let mut escape = false;
-    let start = iter.location();
+    let start = iter.get_location();
+
+    iter.string_context = true;
 
     while let Some(&next_character) = iter.char_iter.peek() {
         match next_character {
@@ -320,45 +432,49 @@ fn lex_string(iter: &mut TokenIterator, character: char) -> Result<Token, Error>
             }
             '\\' if escape => {
                 escape = false;
-                iter.next_location(IterateInternally::Yes);
+                iter.step(EndOfLine::No, Move::Yes);
                 result.push('\\');
             }
             't' if escape => {
                 escape = false;
-                iter.next_location(IterateInternally::Yes);
+                iter.step(EndOfLine::No, Move::Yes);
                 result.push('\t');
             }
             'n' if escape => {
                 escape = false;
-                iter.next_location(IterateInternally::Yes);
+                iter.step(EndOfLine::No, Move::Yes);
                 result.push('\n');
             }
             'r' if escape => {
                 escape = false;
-                iter.next_location(IterateInternally::Yes);
+                iter.step(EndOfLine::No, Move::Yes);
                 result.push('\r');
             }
             x if character == x && escape => {
                 escape = false;
-                iter.next_location(IterateInternally::Yes);
+                iter.step(EndOfLine::No, Move::Yes);
                 result.push(x)
             }
             x if character == x && !escape => {
-                iter.next_location(IterateInternally::Yes);
+                iter.step(EndOfLine::No, Move::Yes);
                 break;
             }
             _ if escape => {
                 let sequence = format!("\\{}", next_character);
-                return Err(Error::InvalidEscapeSequence(sequence, iter.location()));
+                return Err(Error::InvalidEscapeSequence(sequence, iter.get_location()));
             }
             _ => {
                 escape = false;
-                iter.next_location(IterateInternally::Yes);
+                iter.step(EndOfLine::No, Move::Yes);
                 result.push(next_character);
             }
         }
     }
 
+    iter.string_context = false;
+    iter.step(EndOfLine::No, Move::No);
+
     let out: String = result.iter().cloned().collect();
     Ok(Token::string(out, start))
 }
+
