@@ -1,7 +1,8 @@
 pub mod error;
 pub mod token;
+pub mod token_iterator;
 pub use lex::error::{Error, Result};
-use lex::token::StrTokenIterator;
+use lex::token_iterator::StrTokenIterator;
 
 pub fn lex<S: AsRef<str>>(s: S) -> Result {
     // Note that the `collect` call does some magic thanks to
