@@ -21,8 +21,6 @@ pub enum TokenKind {
     BlockComment(String),
     // TODO: Implement datum comments
     DatumComment(String),
-    // TODO: Implement quotes
-    Quote(String),
 }
 
 impl fmt::Debug for TokenKind {
@@ -63,8 +61,7 @@ impl fmt::Debug for TokenKind {
             }
             TokenKind::LineComment(..) |
                 TokenKind::BlockComment(..) |
-                TokenKind::DatumComment(..) |
-                TokenKind::Quote(..) => write!(f, "")
+                TokenKind::DatumComment(..) => write!(f, "")
         }
     }
 }
